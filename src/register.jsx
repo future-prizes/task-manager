@@ -1,6 +1,6 @@
 import {useState} from "react"
 
-function Register(register) {
+function Register(register, registerRedirect) {
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
@@ -21,6 +21,7 @@ function Register(register) {
     
 
     return (
+        <>
         <form onSubmit={(event)=>{register(event)}}>
         <label>Username
             <input
@@ -55,7 +56,12 @@ function Register(register) {
         </label>
         
         <button type="submit">Submit</button>
+
+        <h3 onClick = {registerRedirect}>Login</h3>
+
+
         </form>
+        </>
     )
 }
 

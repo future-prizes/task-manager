@@ -2,7 +2,7 @@ import {useState} from "react"
 
 
 
-function Login({login}) {
+function Login({registerRedirect, login}) {
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
@@ -18,6 +18,8 @@ function Login({login}) {
 
 
     return (
+        <>
+        <h3>Already registered? Sign in here</h3>
         <form onSubmit={(event)=>{login(event)}}>
         <label>Username
             <input
@@ -41,6 +43,9 @@ function Login({login}) {
         
         <button type="submit">Submit</button>
         </form>
+
+        <h4 onClick={registerRedirect}>Register</h4>
+        </>
     )
 }
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import Login from "./login";
 import Register from "./register";
 import NewPost from "./newPost";
+import Landing from "./landing";
 
 function App() {
   const hostURL = "http://127.0.0.1";
@@ -117,9 +118,10 @@ function App() {
       <header>
         <h1>Task Manager</h1>
       </header>
-      {loggedIn===true ? <Dashboard/> : <Login login={login}/>}
+      {loggedIn===true ? <Dashboard/> : <Landing login={login} register={register}/>}
       <Register register={register}/>
       <NewPost newPost = {newPost}/>
+      <Landing/>
       <button onClick={showAll}>Show all</button>
       <h2></h2>
 
