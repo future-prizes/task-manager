@@ -57,8 +57,6 @@ function Register(register, registerRedirect) {
         
         <button type="submit">Submit</button>
 
-        <h3 onClick = {registerRedirect}>Login</h3>
-
 
         </form>
         </>

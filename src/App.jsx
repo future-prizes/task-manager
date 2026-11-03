@@ -119,9 +119,7 @@ function App() {
         <h1>Task Manager</h1>
       </header>
       {loggedIn===true ? <Dashboard/> : <Landing login={login} register={register}/>}
-      <Register register={register}/>
       <NewPost newPost = {newPost}/>
-      <Landing/>
       <button onClick={showAll}>Show all</button>
       <h2></h2>
 

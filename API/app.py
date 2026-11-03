@@ -28,7 +28,7 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days = 1)
 
 #-----------------routes--------------------------#
 
-@app.route("/login", methods = ["GET", "POST"])
+@app.route("api/login", methods = ["GET", "POST"])
 def login():
     error = None
     if request.method == "POST":
@@ -78,7 +78,7 @@ def login():
             return jsonify("Internal error occured"), 500
 
 
-@app.route("/register", methods = ["POST"])
+@app.route("api/register", methods = ["POST"])
 def register():
     error = None
 
@@ -107,12 +107,12 @@ def register():
     except sqlite3.Error as e:
         return jsonify(e)
 
-@app.route("/posts", methods = ["GET"])
+@app.route("api", methods = ["GET"])
 def get_tasks():
     if not session.get("user"):
         return jsonify({"error": "not logged in"}), 401
 
-@app.route("/show-all", methods = ["GET"])
+@app.route("api/show-all", methods = ["GET"])
 def show_all():
     error = None
     
@@ -133,7 +133,7 @@ def show_all():
         error = "Could not connect to database"
         return jsonify(error)
 
-@app.route("/new-post", methods = ["POST"])
+@app.route("api/new-post", methods = ["POST"])
 def new_post():
     error = None
 
