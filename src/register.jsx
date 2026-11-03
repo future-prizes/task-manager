@@ -1,6 +1,7 @@
 import {useState} from "react"
 
-function Register() {
+function Register(register) {
+
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [email, setEmail] = useState("")
@@ -17,18 +18,17 @@ function Register() {
         setEmail(e.target.value)
     }
 
-    function submitter(e) {
-        e.preventDefault()
-    }
+    
 
     return (
-        <form onSubmit={submitter}>
+        <form onSubmit={(event)=>{register(event)}}>
         <label>Username
             <input
             value = {username}
             type="text" 
             required 
             placeholder="username"
+            minLength={3}
             onChange={inputUser}
             />
         </label>
@@ -48,6 +48,7 @@ function Register() {
             value = {password} 
             type="password"  
             required 
+            minLength={6}
             placeholder="password"
             onChange={inputPass}
             />

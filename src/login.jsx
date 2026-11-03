@@ -2,9 +2,11 @@ import {useState} from "react"
 
 
 
-function Login() {
+function Login({login}) {
+
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    
 
     function inputUser(e) {
         setUsername(e.target.value)
@@ -14,12 +16,9 @@ function Login() {
         setPassword(e.target.value)
     }
 
-    function submitter(e) {
-        e.preventDefault()
-    }
 
     return (
-        <form onSubmit={submitter}>
+        <form onSubmit={(event)=>{login(event)}}>
         <label>Username
             <input
             value = {username}

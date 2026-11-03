@@ -1,6 +1,6 @@
 import {useState} from "react"
 
-function NewPost() {
+function NewPost(newPost) {
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [status, setStatus] = useState("")
@@ -22,12 +22,10 @@ function NewPost() {
         setDue(e.target.value)
     }
 
-    function submitter(e) {
-        e.preventDefault()
-    }
+    
 
     return (
-        <form onSubmit={submitter}>
+        <form onSubmit={(event)=>{newPost(event)}}>
         <label>Title
             <input
             value = {title}
@@ -52,7 +50,6 @@ function NewPost() {
             <input
             value = {status} 
             type="status"  
-            required 
             placeholder="status"
             onChange={inputStatus}
             />
@@ -62,7 +59,6 @@ function NewPost() {
             <input
             value = {due} 
             type="due"  
-            required 
             placeholder="due"
             onChange={inputDue}
             />
@@ -76,4 +72,4 @@ function NewPost() {
 
 
 
-export default newPost
+export default NewPost
