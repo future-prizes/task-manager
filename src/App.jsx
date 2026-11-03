@@ -1,3 +1,8 @@
+import {useState} from "react"
+import Login from "./login"
+import Register from "./register"
+
+
 
 function App() {
 
@@ -9,7 +14,8 @@ function App() {
             <header>
                 <h1>Task Manager</h1>
             </header>
-
+                <Login/>
+                <Register/>
 
 
             <footer>
