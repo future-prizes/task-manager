@@ -25,6 +25,14 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days = 1)
 
 
 #-----------------routes--------------------------#
+@app.route("/api", methods=["GET"])
+def verify():
+    error = None
+    if not session.get("user_id"):
+        return jsonify({"ok": False, "message": "not logged in"})
+    
+        
+
 
 @app.route("/api/login", methods = ["GET", "POST"])
 def login():
@@ -60,7 +68,7 @@ def login():
                     session.permanent = True
                     
                     response = {
-                        "all_good": True, 
+                        "ok": True, 
                         "message": f"Welcome {username}", 
                         "user": username, 
                         "go_to":"/dashboard"

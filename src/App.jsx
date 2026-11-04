@@ -1,6 +1,5 @@
 import { useState } from "react";
-import Login from "./login";
-import Register from "./register";
+import Dashboard from "./dashboard";
 import NewPost from "./newPost";
 import Landing from "./landing";
 
@@ -8,41 +7,9 @@ function App() {
   const hostURL = "http://127.0.0.1/";
   const port = "5000";
   const [loggedIn, setLoggedIn] = useState(false)
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [email, setEmail] = useState("")
+  const [userId, setUserId] = useState("")
 
-  async function login(event) {
-    event.preventDefault();
 
-    const loginForm = event.target;
-
-    const loginFormData = new FormData(loginForm);
-    const loginURL = "/api/login";
-
-    if (!loginForm.checkValidity()) {
-      loginForm.checkValidity();
-      return;
-    }
-    try {
-      const result = await fetch(loginURL, {
-        method: "POST",
-        body: loginFormData,
-        credentials: "include",
-      });
-      const response = await result.json();
-      if (!result.ok) {
-        h2.textContent = response.error;
-      } else if (response.all_good) {
-        setUsername(response.user);
-        setLoggedIn(true);
-      }
-    } catch (error) {
-      return error.message;
-    } finally {
-      loginForm.reset();
-    }
-  }
 
 
   async function newPost(event) {
@@ -94,7 +61,7 @@ function App() {
       <header>
         <h1>Task Manager</h1>
       </header>
-      {loggedIn===true ? <Dashboard/> : <Landing login={login}/>}
+      {loggedIn===true ? <Dashboard/> : <Landing setUserId={setUserId} setLoggedIn={setLoggedIn}/>}
       <NewPost newPost = {newPost}/>
       <button onClick={showAll}>Show all</button>
       <h2></h2>

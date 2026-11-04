@@ -2,20 +2,42 @@ import {useState} from "react"
 
 
 
-function Login({registerRedirect, login}) {
+function Login({registerRedirect, setLoggedIn, setUserId}) {
 
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
-    
+    const [loginMessage, setLoginMessage] = useState("")
 
-    function inputUser(e) {
-        setUsername(e.target.value)
+    async function login(event) {
+    event.preventDefault();
+
+    const loginForm = event.target;
+
+    const loginFormData = new FormData(loginForm);
+    const loginURL = "/api/login";
+
+    if (!loginForm.checkValidity()) {
+      loginForm.checkValidity();
+      return;
     }
-
-    function inputPass(e) {
-        setPassword(e.target.value)
+    try {
+      const result = await fetch(loginURL, {
+        method: "POST",
+        body: loginFormData,
+        credentials: "include",
+      });
+      const response = await result.json();
+      if (!result.ok) {
+        setLoginMessage(response.error)
+      } else if (response.ok) {
+        setUserId(response.id);
+        setLoggedIn(true);
+      }
+    } catch (error) {
+        setLoginMessage(error.message)
+      return error.message;
+    } finally {
+      loginForm.reset();
     }
-
+  }
 
     return (
         <>
@@ -23,26 +45,28 @@ function Login({registerRedirect, login}) {
         <form onSubmit={(event)=>{login(event)}}>
         <label>Username
             <input
-            value = {username}
+            name="username"
             type="text" 
             required 
             placeholder="username"
-            onChange={inputUser}
+            
             />
         </label>
         
         <label>Password
             <input
-            value = {password} 
+            name = "password" 
             type="password"  
             required 
             placeholder="password"
-            onChange={inputPass}
+            
             />
         </label>
         
         <button type="submit">Submit</button>
         </form>
+
+        <h2>{loginMessage}</h2>
 
         <a onClick={registerRedirect}style={{color: "red"}}>Register</a>
         </>

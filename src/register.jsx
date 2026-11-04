@@ -29,7 +29,8 @@ function Register() {
       
       
     } catch (error) {
-      return error.message;
+        setMessage(error.message)
+        return error.message;
     } finally {
       registerForm.reset();
     }

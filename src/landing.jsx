@@ -3,7 +3,7 @@ import Register from "./register"
 import {useState} from "react"
 
 
-function Landing(login, register) {
+function Landing({setLoggedIn, setUserId}) {
 
     const [showRegister, setShowRegister] = useState(false)
 
@@ -22,8 +22,8 @@ function Landing(login, register) {
             Welcome to Task Manager
         </h2>
         <div>
-            <Login registerRedirect = {registerRedirect} login = {login}/>
-            {showRegister && <Register registerRedirect = {registerRedirect} register={register} />}         
+            <Login registerRedirect = {registerRedirect} setUserId={setUserId} setLoggedIn={setLoggedIn}/>
+            {showRegister && <Register registerRedirect = {registerRedirect} />}         
         </div>
         </>
     )
