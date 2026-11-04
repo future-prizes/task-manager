@@ -7,11 +7,11 @@ from db import db_connect, db_init_cli
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from datetime import timedelta
+import logging
 
 app = Flask(__name__, instance_relative_config = True)
-CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://localhost:8000"])
 bcrypt = Bcrypt(app)
-
+print("start")
 #config
 
 config_path = os.path.join(app.instance_path, "config.env")
@@ -20,15 +20,13 @@ db_name = os.environ.get("DB_NAME")
 app.config["DB_PATH"] = os.path.join(app.instance_path, db_name)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 app.config["SESSION_PERMANENT"] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.config['SESSION_COOKIE_SECURE'] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days = 1)
 
 
 
 #-----------------routes--------------------------#
 
-@app.route("api/login", methods = ["GET", "POST"])
+@app.route("/api/login", methods = ["GET", "POST"])
 def login():
     error = None
     if request.method == "POST":
@@ -78,15 +76,19 @@ def login():
             return jsonify("Internal error occured"), 500
 
 
-@app.route("api/register", methods = ["POST"])
+@app.route("/api/register", methods = ["POST"])
 def register():
+    logging.error("the register route")
+    
     error = None
 
     try:
+        
         username = request.form.get("username").strip()
         email = request.form.get("email").strip()
         password = request.form.get("password")
-
+        print("hello", flush=True)
+        print(username)
         if len(username) <3:
             error ="Username too short"
         if len(password) <6:
@@ -102,17 +104,20 @@ def register():
             conn.commit()
             conn.close()
             return jsonify({"ok": True, "message": f"New user {username} registered"}), 200
-    except Exception:
-        return jsonify(error)
     except sqlite3.Error as e:
-        return jsonify(e)
+        print(f"database error {e}")
+        return jsonify({"OK":False, "message": e})
+    except Exception as e:
+        print(f"unexpected error {e}")
+        return jsonify({"OK":False, "message": str(e)})
+    
 
-@app.route("api", methods = ["GET"])
+@app.route("/api", methods = ["GET"])
 def get_tasks():
     if not session.get("user"):
         return jsonify({"error": "not logged in"}), 401
 
-@app.route("api/show-all", methods = ["GET"])
+@app.route("/api/show-all", methods = ["GET"])
 def show_all():
     error = None
     
@@ -120,8 +125,8 @@ def show_all():
     
         conn = db_connect()
         cursor = conn.cursor()
-        sql = """SELECT username, password_hash FROM users
-        WHERE username='test'"""
+        sql = """SELECT * FROM users
+        """
         result = cursor.execute(sql)
         rows = result.fetchall()
 
@@ -133,7 +138,7 @@ def show_all():
         error = "Could not connect to database"
         return jsonify(error)
 
-@app.route("api/new-post", methods = ["POST"])
+@app.route("/api/new-post", methods = ["POST"])
 def new_post():
     error = None
 
@@ -201,7 +206,7 @@ def new_post():
 
 
 
-app.cli.add_command(db_init_cli)
+app.cli.add_command(db_init_cli) #flask --app app db_init
 
 if __name__ == "__main__":
     app.run()

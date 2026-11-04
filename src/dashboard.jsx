@@ -17,7 +17,9 @@ function Dashboard({taskData}) {
             due_date = {task.due_date}>
 
             </Task>
-        })}
+        })} 
+        <a>Logout</a>
+        
         </>
     )
 

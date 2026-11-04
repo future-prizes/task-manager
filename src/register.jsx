@@ -1,57 +1,69 @@
 import {useState} from "react"
 
-function Register(register, registerRedirect) {
+function Register() {
 
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
-    const [email, setEmail] = useState("")
+    const [message, setMessage] = useState("")
 
-    function inputUser(e) {
-        setUsername(e.target.value)
+    async function register(event) {
+    event.preventDefault();
+    const registerForm = event.target
+    const registerFormData = new FormData(registerForm);
+    const regiserURL = "/api/register";
+
+    if (!registerForm.checkValidity()) {
+      registerForm.checkValidity();
+      return;
     }
-
-    function inputPass(e) {
-        setPassword(e.target.value)
+    try {
+      const result = await fetch(regiserURL, {
+        method: "POST",
+        body: registerFormData,
+      });
+      if (!result.ok) {
+        throw new Error("no response");
+      }
+      const response = await result.json();
+      if (response.message) {
+        setMessage(response.message)
+      }
+      
+      
+    } catch (error) {
+      return error.message;
+    } finally {
+      registerForm.reset();
     }
-
-    function inputEmail(e) {
-        setEmail(e.target.value)
-    }
-
-    
+  }
 
     return (
         <>
         <form onSubmit={(event)=>{register(event)}}>
         <label>Username
             <input
-            value = {username}
+            name = "username"
             type="text" 
             required 
             placeholder="username"
             minLength={3}
-            onChange={inputUser}
             />
         </label>
 
         <label>Email
             <input
-            value = {email} 
+            name = "email"
             type="email"  
             required 
             placeholder="email"
-            onChange={inputEmail}
             />
         </label>
         
         <label>Password
             <input
-            value = {password} 
+            name = "password"
             type="password"  
             required 
             minLength={6}
             placeholder="password"
-            onChange={inputPass}
             />
         </label>
         
@@ -59,6 +71,7 @@ function Register(register, registerRedirect) {
 
 
         </form>
+        <h2>{message}</h2>
         </>
     )
 }

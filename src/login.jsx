@@ -44,7 +44,7 @@ function Login({registerRedirect, login}) {
         <button type="submit">Submit</button>
         </form>
 
-        <h4 onClick={registerRedirect}>Register</h4>
+        <a onClick={registerRedirect}style={{color: "red"}}>Register</a>
         </>
     )
 }
