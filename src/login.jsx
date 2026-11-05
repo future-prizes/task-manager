@@ -42,7 +42,7 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
     return (
         <>
         <h3>Already registered? Sign in here</h3>
-        <form onSubmit={(event)=>{login(event)}}>
+        <form method="POST" onSubmit={(event)=>{login(event)}}>
         <label>Username
             <input
             name="username"

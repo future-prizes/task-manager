@@ -118,7 +118,40 @@ def register():
     except Exception as e:
         print(f"unexpected error {e}")
         return jsonify({"OK":False, "message": str(e)})
-    
+
+@app.route("api/logout", methods = ["GET"])
+def logout():
+    session.clear()
+    return jsonify({"ok":True, "message": "logged-out"}), 200
+
+@app.route("api/load-tasks/<int:user_id>", methods = ["GET"])
+def load_tasks(user_id):
+
+    if session["user_id"] == user_id:
+        error = None
+
+        try:
+            user_id = session["user_id"]
+            conn = db_connect()
+            conn.row_factory = sqlite3.Row #returns object rather than tuple
+            cursor = conn.cursor()
+
+            sql = """SELECT title, description, status, due_date FROM tasks t 
+            JOIN users u ON t.user_id = u.id ORDER BY due_date ASC
+            """
+            cursor.execute(sql, (user_id, ))
+            tasks = cursor.fetchall()
+            conn.close()
+            return jsonify({tasks}), 200
+        
+        except sqlite3.Error as e:
+            print(f"database error {e}")
+            return jsonify({"OK":False, "message": e})
+        except Exception as e:
+            print(f"unexpected error {e}")
+            return jsonify({"OK":False, "message": str(e)})
+    else:
+        return jsonify({"ok": False, "message": "not logged in or wrong ID"})
 
 @app.route("/api", methods = ["GET"])
 def get_tasks():

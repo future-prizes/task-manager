@@ -38,7 +38,7 @@ function Register() {
 
     return (
         <>
-        <form onSubmit={(event)=>{register(event)}}>
+        <form method="POST" onSubmit={(event)=>{register(event)}}>
         <label>Username
             <input
             name = "username"
