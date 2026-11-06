@@ -1,4 +1,5 @@
 import Task from "./task"
+import EmptyDash from "./emptyDash"
 import { useEffect } from "react"
 
 function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
@@ -14,6 +15,7 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
                 throw new Error("no response")
             }
             const fetchedTasks = await result.json()
+            
             
             setTasks(fetchedTasks.map((task)=>({
                 title: task.title,
@@ -58,7 +60,8 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
         <>
         <div>
             <h2>Dashboard</h2>
-        </div>        
+        </div>    
+        {tasks.length ===0 ? <EmptyDash/>: ""}    
         {tasks.map((task, index) => (
             <Task 
             key={index}
