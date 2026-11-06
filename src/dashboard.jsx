@@ -1,6 +1,7 @@
 import Task from "./task"
 import EmptyDash from "./emptyDash"
 import { useEffect } from "react"
+import NewPost from "./newPost"
 
 function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
 
@@ -15,7 +16,7 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
                 throw new Error("no response")
             }
             const fetchedTasks = await result.json()
-            
+            console.log(fetchedTasks)
             
             setTasks(fetchedTasks.map((task)=>({
                 title: task.title,
@@ -71,7 +72,8 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
             due_date = {task.due_date}>
 
             </Task>
-        ))} 
+        ))}
+        <NewPost/>
         <h2></h2>
         <button onClick = {logout}>Logout</button>
         

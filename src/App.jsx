@@ -11,35 +11,6 @@ function App() {
   const [tasks , setTasks] = useState([])
 
 
-
-
-  async function newPost(event) {
-
-    event.preventDefault();
-    const taskForm = event.target;
-    const h1 = document.querySelector("h1");
-    const newTaskURL = "/api/new-post";
-    const newPostFormData = new FormData(taskForm);
-    try {
-      const result = await fetch(newTaskURL, {
-        method: "POST",
-        body: newPostFormData,
-      });
-      if (!result.ok) {
-        throw new Error("No response");
-      } else {
-        const response = await result.json();
-        h1.textContent = response;
-      }
-    } catch (error) {
-      return error.message;
-    }
-    finally{
-        taskForm.reset()
-    }
-    taskForm.reset();
-  }
-
   // test functions
   async function showAll() {
     const fetchAllURL = "/api/show-all";
@@ -63,7 +34,7 @@ function App() {
         <h1>Task Manager</h1>
       </header>
       {loggedIn===true ? <Dashboard loggedIn = {loggedIn} setLoggedIn={setLoggedIn} user_id={userId} setUserId = {setUserId} tasks={tasks} setTasks={setTasks}/> : <Landing setUserId={setUserId} setLoggedIn={setLoggedIn}/>}
-      <NewPost newPost = {newPost}/>
+      
       <button onClick={showAll}>Show all</button>
       <h2></h2>
 

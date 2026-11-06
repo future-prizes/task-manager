@@ -115,7 +115,7 @@ def register():
             return jsonify({"ok": True, "message": f"New user {username} registered"}), 200
     except sqlite3.Error as e:
         print(f"database error {e}")
-        return jsonify({"OK":False, "message": str(e)})
+        return jsonify({"OK":False, "message": str(e)}), 400
     except Exception as e:
         print(f"unexpected error {e}")
         return jsonify({"OK":False, "message": str(e)})
@@ -134,7 +134,7 @@ def load_tasks(user_id):
         try:
             user_id = session["user_id"]
             conn = db_connect()
-            conn.row_factory = sqlite3.Row #returns object rather than tuple
+            conn.row_factory = sqlite3.Row #returns dictionary rather than tuple
             cursor = conn.cursor()
 
             sql = """SELECT title, description, status, due_date FROM tasks t 
@@ -142,9 +142,10 @@ def load_tasks(user_id):
             """
             cursor.execute(sql, (user_id, ))
             tasks = cursor.fetchall()
+            task_dict = [{col: task[col] for col in task.keys()} for task in tasks]
             
             conn.close()
-            return jsonify(tasks), 200
+            return jsonify(task_dict), 200
         
         except sqlite3.Error as e:
             print(f"database error {e}")
@@ -189,7 +190,7 @@ def new_post():
         title = request.form.get("title")
         description = request.form.get("description")
         due_date = request.form.get("due_date")
-        status = request.form.get("status")
+        status = request.form.get("status") if request.form.get("status") else ""
 
         if not title:
             error = "title is empty"
@@ -197,12 +198,7 @@ def new_post():
         if not description:
             error = "description is empty"
             raise ValueError(error)
-        if not due_date:
-            error = "due date is empty"
-            raise ValueError(error)
-        if not status:
-            error = "status is empty (will default to to-do)"
-            raise ValueError(error)
+        
 
         if error is None:
             conn = db_connect()
@@ -211,16 +207,20 @@ def new_post():
             sql = """INSERT INTO tasks (user_id, title, description, due_date, status)
             VALUES (?, ?, ?, ?, ?)"""
 
-            cursor.execute(sql, (session["user-id"],title, description, due_date, status))
+            cursor.execute(sql, (session.get("user_id"),title, description, due_date, status))
 
             conn.commit()
             conn.close()
-            return ("Task added")
-    except Exception:
-        return jsonify(error), 400
+            return jsonify({"ok": True, "message": "New task added"})
     except sqlite3.Error as e:
-        return jsonify(e), 500
-        
+                print(f"database error {e}")
+                return jsonify({"OK":False, "message": str(e)}), 400
+    except Exception as e:
+                print(f"unexpected error {e}")
+                return jsonify({"OK":False, "message": str(e)}), 400
+    finally:
+        if conn:
+            conn.close()
 
 
 
