@@ -71,7 +71,8 @@ def login():
                         "ok": True, 
                         "message": f"Welcome {username}", 
                         "user": username, 
-                        "go_to":"/dashboard"
+                        "go_to":"/dashboard",
+                        "id": user[0]
                         }
                     
                     return jsonify(response), 200
@@ -114,17 +115,17 @@ def register():
             return jsonify({"ok": True, "message": f"New user {username} registered"}), 200
     except sqlite3.Error as e:
         print(f"database error {e}")
-        return jsonify({"OK":False, "message": e})
+        return jsonify({"OK":False, "message": str(e)})
     except Exception as e:
         print(f"unexpected error {e}")
         return jsonify({"OK":False, "message": str(e)})
 
-@app.route("api/logout", methods = ["GET"])
+@app.route("/api/logout", methods = ["GET"])
 def logout():
     session.clear()
     return jsonify({"ok":True, "message": "logged-out"}), 200
 
-@app.route("api/load-tasks/<int:user_id>", methods = ["GET"])
+@app.route("/api/load-tasks/<int:user_id>", methods = ["GET"])
 def load_tasks(user_id):
 
     if session["user_id"] == user_id:
@@ -137,16 +138,17 @@ def load_tasks(user_id):
             cursor = conn.cursor()
 
             sql = """SELECT title, description, status, due_date FROM tasks t 
-            JOIN users u ON t.user_id = u.id ORDER BY due_date ASC
+            JOIN users u ON t.user_id = u.id WHERE u.id = ? ORDER BY due_date ASC
             """
             cursor.execute(sql, (user_id, ))
             tasks = cursor.fetchall()
+            
             conn.close()
-            return jsonify({tasks}), 200
+            return jsonify(tasks), 200
         
         except sqlite3.Error as e:
             print(f"database error {e}")
-            return jsonify({"OK":False, "message": e})
+            return jsonify({"OK":False, "message": str(e)})
         except Exception as e:
             print(f"unexpected error {e}")
             return jsonify({"OK":False, "message": str(e)})

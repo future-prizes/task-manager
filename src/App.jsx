@@ -8,6 +8,7 @@ function App() {
   const port = "5000";
   const [loggedIn, setLoggedIn] = useState(false)
   const [userId, setUserId] = useState("")
+  const [tasks , setTasks] = useState([])
 
 
 
@@ -61,7 +62,7 @@ function App() {
       <header>
         <h1>Task Manager</h1>
       </header>
-      {loggedIn===true ? <Dashboard/> : <Landing setUserId={setUserId} setLoggedIn={setLoggedIn}/>}
+      {loggedIn===true ? <Dashboard loggedIn = {loggedIn} setLoggedIn={setLoggedIn} user_id={userId} setUserId = {setUserId} tasks={tasks} setTasks={setTasks}/> : <Landing setUserId={setUserId} setLoggedIn={setLoggedIn}/>}
       <NewPost newPost = {newPost}/>
       <button onClick={showAll}>Show all</button>
       <h2></h2>
