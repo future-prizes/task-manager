@@ -6,6 +6,8 @@ import NewPost from "./newPost"
 function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
 
     async function loadTasks(){
+        console.log(user_id)
+        
         const loadTasksURL = `/api/load-tasks/${user_id}`
         try {
             const result = await fetch(loadTasksURL, {

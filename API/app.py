@@ -1,13 +1,11 @@
-from flask import Flask, request, session, jsonify, redirect, render_template
+from flask import Flask, request, session, jsonify, redirect, url_for
 import sqlite3
 from dotenv import load_dotenv
-from pathlib import Path
 import os
 from db import db_connect, db_init_cli
 from flask_bcrypt import Bcrypt
-from flask_cors import CORS
 from datetime import timedelta
-import logging
+
 
 app = Flask(__name__, instance_relative_config = True)
 bcrypt = Bcrypt(app)
@@ -36,6 +34,7 @@ def verify():
 
 @app.route("/api/login", methods = ["GET", "POST"])
 def login():
+    print("login")
     error = None
     if request.method == "POST":
         try:
@@ -83,11 +82,16 @@ def login():
         except Exception as ex:
             print(ex)
             return jsonify("Internal error occured"), 500
+    elif session.get("user_id"):
+        return jsonify({
+                        "ok": True,  
+                        "go_to":"/dashboard",
+                        })
+
 
 
 @app.route("/api/register", methods = ["POST"])
 def register():
-    logging.error("the register route")
     
     error = None
 
@@ -156,10 +160,13 @@ def load_tasks(user_id):
     else:
         return jsonify({"ok": False, "message": "not logged in or wrong ID"})
 
-@app.route("/api", methods = ["GET"])
-def get_tasks():
-    if not session.get("user"):
-        return jsonify({"error": "not logged in"}), 401
+@app.route("/api/", methods = ["GET"])
+def api():
+    print("api called")
+    
+    if session.get("user_id"):
+        print("session")
+        return jsonify({"ok": True, "message": "logged in", "user_id": session.get("user_id")})
 
 @app.route("/api/show-all", methods = ["GET"])
 def show_all():
@@ -190,6 +197,7 @@ def new_post():
         title = request.form.get("title")
         description = request.form.get("description")
         due_date = request.form.get("due_date")
+        cleaned_date = due_date.replace("T", " ")
         status = request.form.get("status") if request.form.get("status") else ""
 
         if not title:
@@ -197,6 +205,12 @@ def new_post():
             raise ValueError(error)
         if not description:
             error = "description is empty"
+            raise ValueError(error)
+        if not due_date:
+            error = "due date is empty"
+            raise ValueError(error)
+        if not status:
+            error = "status is empty"
             raise ValueError(error)
         
 
@@ -207,7 +221,7 @@ def new_post():
             sql = """INSERT INTO tasks (user_id, title, description, due_date, status)
             VALUES (?, ?, ?, ?, ?)"""
 
-            cursor.execute(sql, (session.get("user_id"),title, description, due_date, status))
+            cursor.execute(sql, (session.get("user_id"),title, description, cleaned_date, status))
 
             conn.commit()
             conn.close()

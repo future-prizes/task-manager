@@ -48,15 +48,15 @@ function NewPost(newPost) {
         <label>
           Status
           <select name="status" required >
-            <option value="to do"></option>
-            <option value="in progress"></option>
-            <option value="completed"></option>
+            <option value="to do">to do</option>
+            <option value="in progress">in progress</option>
+            <option value="completed">completed</option>
           </select>
         </label>
 
         <label>
           Due date
-          <input name="due_date"type="text" required placeholder="due" />
+          <input name="due_date"type="datetime-local" required/>
         </label>
 
         <button type="submit">Submit</button>

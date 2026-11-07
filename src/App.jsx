@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Dashboard from "./dashboard";
-import NewPost from "./newPost";
 import Landing from "./landing";
 
 function App() {
@@ -27,6 +26,29 @@ function App() {
       return error.message;
     }
   }
+
+  async function api() {
+    
+    const apiURL = "/api/";
+    try {
+      const result = await fetch(apiURL, {
+        method : "GET",
+        credentials : "include"
+      })
+      if (!result.ok){
+        throw new Error("no response")
+      }
+      else if (result.ok) {
+      const response = await result.json()
+      setLoggedIn(true)
+      setUserId(response.user_id)
+    }
+    } catch (error) {
+      return error.message
+    }
+  }
+
+  useEffect(()=>{api()}, [])
 
   return (
     <>
