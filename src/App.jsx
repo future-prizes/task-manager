@@ -12,6 +12,7 @@ function App() {
 
   // test functions
   async function showAll() {
+    
     const fetchAllURL = "/api/show-all";
     try {
       const result = await fetch(fetchAllURL, {
@@ -28,7 +29,7 @@ function App() {
   }
 
   async function api() {
-    
+    console.log("calling api")
     const apiURL = "/api/";
     try {
       const result = await fetch(apiURL, {
@@ -39,9 +40,13 @@ function App() {
         throw new Error("no response")
       }
       else if (result.ok) {
+        
       const response = await result.json()
+      if (response.ok) {
       setLoggedIn(true)
       setUserId(response.user_id)
+      }
+      
     }
     } catch (error) {
       return error.message
@@ -55,7 +60,15 @@ function App() {
       <header>
         <h1>Task Manager</h1>
       </header>
-      {loggedIn===true ? <Dashboard loggedIn = {loggedIn} setLoggedIn={setLoggedIn} user_id={userId} setUserId = {setUserId} tasks={tasks} setTasks={setTasks}/> : <Landing setUserId={setUserId} setLoggedIn={setLoggedIn}/>}
+      {loggedIn===true ? <Dashboard 
+        loggedIn = {loggedIn} 
+        setLoggedIn={setLoggedIn} 
+        user_id={userId} 
+        setUserId = {setUserId} 
+        tasks={tasks} 
+        setTasks={setTasks}
+        /> 
+      : <Landing setUserId={setUserId} setLoggedIn={setLoggedIn}/>}
       
       <button onClick={showAll}>Show all</button>
       <h2></h2>

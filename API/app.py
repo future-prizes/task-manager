@@ -23,14 +23,6 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days = 1)
 
 
 #-----------------routes--------------------------#
-@app.route("/api", methods=["GET"])
-def verify():
-    error = None
-    if not session.get("user_id"):
-        return jsonify({"ok": False, "message": "not logged in"})
-    
-        
-
 
 @app.route("/api/login", methods = ["GET", "POST"])
 def login():
@@ -138,16 +130,15 @@ def load_tasks(user_id):
         try:
             user_id = session["user_id"]
             conn = db_connect()
-            conn.row_factory = sqlite3.Row #returns dictionary rather than tuple
+            conn.row_factory = sqlite3.Row #returns object rather than tuple
             cursor = conn.cursor()
 
-            sql = """SELECT title, description, status, due_date FROM tasks t 
+            sql = """SELECT t.id, title, description, status, due_date FROM tasks t 
             JOIN users u ON t.user_id = u.id WHERE u.id = ? ORDER BY due_date ASC
             """
             cursor.execute(sql, (user_id, ))
             tasks = cursor.fetchall()
             task_dict = [{col: task[col] for col in task.keys()} for task in tasks]
-            
             conn.close()
             return jsonify(task_dict), 200
         
@@ -160,6 +151,37 @@ def load_tasks(user_id):
     else:
         return jsonify({"ok": False, "message": "not logged in or wrong ID"})
 
+@app.route("/api/delete-task/<int:task_id>", methods = ["DELETE"])
+def delete_task(task_id):
+    error = None
+    if session.get("user_id"): #checks if user_id from client matches user_id in session
+        print("user id check")
+        error = None
+        try:
+            conn= db_connect()
+            cursor = conn.cursor()
+
+            sql = """DELETE FROM tasks WHERE id = ?"""
+            cursor.execute(sql, (task_id, ))
+            conn.commit()
+            
+            return jsonify({"ok": True, "message": f"task {task_id} deleted"})
+        except sqlite3.Error as e:
+            print(f"database error {e}")
+            return jsonify({"OK":False, "message": str(e)})
+        except Exception as e:
+            print(f"unexpected error {e}")
+            return jsonify({"OK":False, "message": str(e)})
+
+        finally:
+            conn.close()
+    else:
+        error = "user id does not match"
+        return jsonify(error), 404
+
+
+
+
 @app.route("/api/", methods = ["GET"])
 def api():
     print("api called")
@@ -167,6 +189,8 @@ def api():
     if session.get("user_id"):
         print("session")
         return jsonify({"ok": True, "message": "logged in", "user_id": session.get("user_id")})
+    else:
+        return jsonify({"ok": False, "message": "not logged in"})
 
 @app.route("/api/show-all", methods = ["GET"])
 def show_all():

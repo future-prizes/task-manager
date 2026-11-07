@@ -6,8 +6,7 @@ import NewPost from "./newPost"
 function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
 
     async function loadTasks(){
-        console.log(user_id)
-        
+        console.log("calling load tasks")
         const loadTasksURL = `/api/load-tasks/${user_id}`
         try {
             const result = await fetch(loadTasksURL, {
@@ -18,21 +17,39 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
                 throw new Error("no response")
             }
             const fetchedTasks = await result.json()
-            console.log(fetchedTasks)
+
             
             setTasks(fetchedTasks.map((task)=>({
+                task_id: task.id,
                 title: task.title,
                 description : task.description,
                 status: task.status,
                 due_date:task.due_date
             })))
-            
-
+            console.log(fetchedTasks)
         }
         catch (error) {
             return error.message
         }
     } 
+
+    async function deleteTask(task_id, user_id){
+        const deleteURL = `/api/delete-task/${task_id}`
+        try {
+
+            const result = await fetch(deleteURL, {
+                method: "DELETE",
+                credentials: "include"
+            })
+            if (!result.ok) {
+                throw new Error("no reponse")
+            }
+            const response = await result.json()
+        }
+        catch (error) {
+            return error.message
+        }
+    }
 
     async function logout() {
         const logoutURL = "/api/logout"
@@ -66,12 +83,16 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
         </div>    
         {tasks.length ===0 ? <EmptyDash/>: ""}    
         {tasks.map((task, index) => (
+            
             <Task 
             key={index}
             title = {task.title}
             description = {task.description}
             status = {task.status}
-            due_date = {task.due_date}>
+            due_date = {task.due_date}
+            deleteTask = {deleteTask}
+            task_id = {task.task_id}
+            user_id = {user_id}>
 
             </Task>
         ))}
