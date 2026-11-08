@@ -1,4 +1,4 @@
-function NewPost(newPost) {
+function NewPost({loadTasks}) {
 
   async function newPost(event) {
     event.preventDefault();
@@ -18,8 +18,8 @@ function NewPost(newPost) {
       if (!result.ok) {
         throw new Error("No response");
       } else {
-        const response = await result.json();
-        h3.textContent = response.message;
+        const response = await result.json()
+        loadTasks()
       }
     } catch (error) {
       return error.message;
@@ -42,7 +42,7 @@ function NewPost(newPost) {
 
         <label>
           Description
-          <input name = "description"type="test" required placeholder="description" />
+          <textarea name = "description" required placeholder="description" />
         </label>
 
         <label>

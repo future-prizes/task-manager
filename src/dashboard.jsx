@@ -1,9 +1,19 @@
 import Task from "./task"
 import EmptyDash from "./emptyDash"
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 import NewPost from "./newPost"
 
 function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
+    const [editing, setEditing] = useState(false);
+    
+      function handleEdit() {
+        if (editing) {
+          setEditing(false);
+        } else {
+          setEditing(true);
+        }
+      }
+    
 
     async function loadTasks(){
         console.log("calling load tasks")
@@ -33,7 +43,7 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
         }
     } 
 
-    async function deleteTask(task_id, user_id){
+    async function deleteTask(task_id){
         const deleteURL = `/api/delete-task/${task_id}`
         try {
 
@@ -44,10 +54,29 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
             if (!result.ok) {
                 throw new Error("no reponse")
             }
+            
             const response = await result.json()
+            if (response.ok) {
+            loadTasks()
+            }
         }
         catch (error) {
             return error.message
+        }
+    }
+
+    async function editTask(task_id) {
+        const editTaskURL = `api/edit-task/${task_id}`
+        const result = await fetch(editTaskURL, {
+            method : "UPDATE",
+            credentials: "include"
+        })
+        if (!result.ok) {
+            throw new Error("no response")
+        }
+        const response = result.json()
+        if (response.ok) {
+            loadTasks()
         }
     }
 
@@ -91,12 +120,13 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
             status = {task.status}
             due_date = {task.due_date}
             deleteTask = {deleteTask}
+            editTask = {editTask}
             task_id = {task.task_id}
-            user_id = {user_id}>
+            >
 
             </Task>
         ))}
-        <NewPost/>
+        <NewPost loadTasks={loadTasks}/>
         <h2></h2>
         <button onClick = {logout}>Logout</button>
         

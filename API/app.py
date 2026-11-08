@@ -123,7 +123,7 @@ def logout():
 
 @app.route("/api/load-tasks/<int:user_id>", methods = ["GET"])
 def load_tasks(user_id):
-
+    print("load tasks called")
     if session["user_id"] == user_id:
         error = None
 
@@ -155,7 +155,6 @@ def load_tasks(user_id):
 def delete_task(task_id):
     error = None
     if session.get("user_id"): #checks if user_id from client matches user_id in session
-        print("user id check")
         error = None
         try:
             conn= db_connect()
@@ -187,7 +186,6 @@ def api():
     print("api called")
     
     if session.get("user_id"):
-        print("session")
         return jsonify({"ok": True, "message": "logged in", "user_id": session.get("user_id")})
     else:
         return jsonify({"ok": False, "message": "not logged in"})
@@ -248,7 +246,7 @@ def new_post():
             cursor.execute(sql, (session.get("user_id"),title, description, cleaned_date, status))
 
             conn.commit()
-            conn.close()
+            
             return jsonify({"ok": True, "message": "New task added"})
     except sqlite3.Error as e:
                 print(f"database error {e}")
