@@ -68,32 +68,29 @@ def login():
                     
                     return jsonify(response), 200
                 if error is not None:
-                    return jsonify({"error": error}), 400 
+                    return jsonify({"ok": False, "message": error}), 400 
             elif error is not None:
-                    return jsonify({"error": error}), 400          
-        except Exception as ex:
-            print(ex)
-            return jsonify("Internal error occured"), 500
+                    return jsonify({"ok": False, "message": error}), 400 
+        except sqlite3.Error as e:
+            print(f"database error {e}")
+            return jsonify({"OK":False, "message": str(e)}), 400         
+        except Exception as e:
+            print(f"unexpected error {e}")
+            return jsonify({"OK":False, "message": str(e)}), 400
     elif session.get("user_id"):
         return jsonify({
                         "ok": True,  
                         "go_to":"/dashboard",
                         })
 
-
-
 @app.route("/api/register", methods = ["POST"])
 def register():
-    
     error = None
-
     try:
-        
         username = request.form.get("username").strip()
         email = request.form.get("email").strip()
         password = request.form.get("password")
-        print("hello", flush=True)
-        print(username)
+
         if len(username) <3:
             error ="Username too short"
         if len(password) <6:
@@ -105,16 +102,17 @@ def register():
             sql = """INSERT INTO users (username, email, password_hash)
                     VALUES (?,?,?)"""
             cursor.execute(sql, (username, email, bcrypt.generate_password_hash(password).decode("utf-8")))
-
             conn.commit()
-            conn.close()
             return jsonify({"ok": True, "message": f"New user {username} registered"}), 200
     except sqlite3.Error as e:
         print(f"database error {e}")
         return jsonify({"OK":False, "message": str(e)}), 400
     except Exception as e:
         print(f"unexpected error {e}")
-        return jsonify({"OK":False, "message": str(e)})
+        return jsonify({"OK":False, "message": str(e)}), 400
+    finally:
+        if conn:
+            conn.close()
 
 @app.route("/api/logout", methods = ["GET"])
 def logout():
@@ -125,8 +123,6 @@ def logout():
 def load_tasks(user_id):
     print("load tasks called")
     if session["user_id"] == user_id:
-        error = None
-
         try:
             user_id = session["user_id"]
             conn = db_connect()
@@ -139,7 +135,6 @@ def load_tasks(user_id):
             cursor.execute(sql, (user_id, ))
             tasks = cursor.fetchall()
             task_dict = [{col: task[col] for col in task.keys()} for task in tasks]
-            conn.close()
             return jsonify(task_dict), 200
         
         except sqlite3.Error as e:
@@ -148,14 +143,15 @@ def load_tasks(user_id):
         except Exception as e:
             print(f"unexpected error {e}")
             return jsonify({"OK":False, "message": str(e)})
+        finally:
+            if conn:
+                conn.close()
     else:
         return jsonify({"ok": False, "message": "not logged in or wrong ID"})
 
 @app.route("/api/delete-task/<int:task_id>", methods = ["DELETE"])
 def delete_task(task_id):
-    error = None
-    if session.get("user_id"): #checks if user_id from client matches user_id in session
-        error = None
+    if session.get("user_id"): 
         try:
             conn= db_connect()
             cursor = conn.cursor()
@@ -175,11 +171,7 @@ def delete_task(task_id):
         finally:
             conn.close()
     else:
-        error = "user id does not match"
-        return jsonify(error), 404
-
-
-
+        return jsonify({"ok": False, "message": "not logged in or task not found"})
 
 @app.route("/api/", methods = ["GET"])
 def api():
@@ -190,31 +182,44 @@ def api():
     else:
         return jsonify({"ok": False, "message": "not logged in"})
 
-@app.route("/api/show-all", methods = ["GET"])
-def show_all():
+@app.route("/api/update-task/<int:task_id>", methods = ["PATCH"])
+def updateTask(task_id):
     error = None
-    
-    try:
-    
-        conn = db_connect()
-        cursor = conn.cursor()
-        sql = """SELECT * FROM users
-        """
-        result = cursor.execute(sql)
-        rows = result.fetchall()
+    if session.get("user_id"):
+        try:
+            title = request.form.get("title")
+            description = request.form.get("description")
+            status = request.form.get("status")
+            due_date = request.form.get("due_date")
+        
+            conn = db_connect()
+            cursor = conn.cursor()
 
-        conn.commit()
-        conn.close()
-        print(rows)
-        return jsonify(rows)
-    except:
-        error = "Could not connect to database"
-        return jsonify(error)
+            sql = """UPDATE tasks 
+            SET title = ?,
+            description = ?,
+            status = ?,
+            due_date = ?
+            WHERE id = ?"""
+            cursor.execute(sql, (title, description, status, due_date, task_id))
+
+            conn.commit()
+            return jsonify({"ok": True, "message": f"task {task_id} updated"})
+        except sqlite3.Error as e:
+            print(f"database error {e}")
+            return jsonify({"OK":False, "message": str(e)})
+        except Exception as e:
+            print(f"unexpected error {e}")
+            return jsonify({"OK":False, "message": str(e)})
+        finally:
+            if conn:
+                conn.close()
+    else:
+        return jsonify({"ok": False, "message": "not logged in or task not found"})
 
 @app.route("/api/new-post", methods = ["POST"])
 def new_post():
     error = None
-
     try:
         title = request.form.get("title")
         description = request.form.get("description")
@@ -235,7 +240,6 @@ def new_post():
             error = "status is empty"
             raise ValueError(error)
         
-
         if error is None:
             conn = db_connect()
             cursor = conn.cursor()
@@ -258,6 +262,25 @@ def new_post():
         if conn:
             conn.close()
 
+# debug route
+@app.route("/api/show-all", methods = ["GET"])
+def show_all():
+    error = None
+    try:
+        conn = db_connect()
+        cursor = conn.cursor()
+        sql = """SELECT * FROM users
+        """
+        result = cursor.execute(sql)
+        rows = result.fetchall()
+
+        conn.commit()
+        conn.close()
+        print(rows)
+        return jsonify(rows)
+    except:
+        error = "Could not connect to database"
+        return jsonify(error)
 
 
 

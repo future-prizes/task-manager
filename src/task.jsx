@@ -1,11 +1,9 @@
-import { useState } from "react";
-
-function Editing({ title, description, due_date, editTask, handleEdit, task_id }) {
+function Editing({ title, description, due_date, handleEdit, task_id, editTask}) {
   return (
     <section>
       <form
-        onSubmit={() => {
-          editTask(task_id);
+        onSubmit={(event) => {
+          editTask(event, task_id);
         }}
       >
         <label>
@@ -37,31 +35,23 @@ function Editing({ title, description, due_date, editTask, handleEdit, task_id }
           <input defaultValue = {due_date}name="due_date" type="datetime-local" required />
         </label>
 
-        <input type="submit"Submit/>
+        <input type="submit" value="Save Changes"/>
       </form>
       <button onClick = {handleEdit}>Cancel</button>
     </section>
   );
 }
 
-function Task({ title, description, status, due_date, deleteTask, task_id, editTask }) {
-  const [editing, setEditing] = useState(false);
-
-  function handleEdit() {
-    if (editing) {
-      setEditing(false);
-    } else {
-      setEditing(true);
-    }
-  }
+function Task({ title, description, status, due_date, deleteTask, task_id, handleEdit, editing, editTask }) {
 
   return editing ? (
     <Editing 
     title = {title}
     description = {description}
     due_date= {due_date}
-    editTask = {editTask}
     handleEdit = {handleEdit}
+    task_id={task_id}
+    editTask = {editTask}
 
     />
   ) : (
