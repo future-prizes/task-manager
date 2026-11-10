@@ -29,38 +29,35 @@ function NewPost({loadTasks}) {
   }
 
   return (
-    <div className="mx-auto w-1/4 ">
-      <form className="flex flex-col justify-center items-center"
+    <div className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 p-8 flex flex-col w-1/2">
+      <form className="flex flex-col gap-5 m-6"
         onSubmit={(event) => {
           newPost(event);
         }}
       >
-        <label className="text-center flex items-center w-full">
+        <div className="flex gap-2">
+        <label className="flex basis-2/3 flex-col gap-2 ">
           Title
-          <input className="ml-auto m-4" name = "title" type="text" required placeholder="title" />
+          <input className="p-2 bg-sky-100 rounded-sm border-1 placeholder:italic" name = "title" type="text" required placeholder="title" />
         </label>
-        
-        <label className="items-center flex flex-col text-center w-full min-h-20">
-          Description
-          <textarea className="m-4 w-full" name = "description" required placeholder="description" />
-        </label>
-        
-
-        <label className="items-center flex w-full">
+        <label className="flex basis-1/3 grow flex-col gap-2">
           Status
-          <select className="ml-auto m-4" name="status" required >
-            <option value="to do">to do</option>
-            <option value="in progress">in progress</option>
-            <option value="completed">completed</option>
-          </select>
+        <select className="p-2 bg-sky-100 rounded-sm border-1" name="status" required >
+          <option value="to do">to do</option>
+          <option value="in progress">in progress</option>
+          <option value="completed">completed</option>
+        </select>
         </label>
-
-        <label className="items-center flex w-full">
+        </div>
+        <label className="w-1/2 flex flex-col gap-2">
           Due date
-          <input className="ml-auto m-4"name="due_date"type="datetime-local" required/>
+          <input className="p-2 bg-sky-100 rounded-sm border-1" name="due_date"type="datetime-local" required/>
         </label>
-
-        <button className="cursor-pointer hover:text-gray-400 px-4 mt-6" type="submit">Submit</button>
+        <label className="items-center flex flex-col text-center gap-2">
+          Description
+          <textarea className="p-2 bg-sky-100 rounded-sm border-1 w-full min-h-40 placeholder:italic" name = "description" required placeholder="description" />
+        </label>
+        <button className="mt-3 place-self-center w-1/3 text-xl font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 " type="submit">Submit</button>
       </form>
       <h3></h3>
     </div>

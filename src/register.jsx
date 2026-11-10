@@ -37,10 +37,12 @@ function Register() {
   }
 
     return (
-        <>
-        <form method="POST" onSubmit={(event)=>{register(event)}}>
-        <label>Username
+        <section className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 p-8 flex flex-col w-1/4">
+        <h3 className="font-medium text-center mb-6" >Enter your details here</h3>
+        <form className="flex flex-col gap-2 m-6 " method="POST" onSubmit={(event)=>{register(event)}}>
+        <label className="flex flex-col gap-2">Username
             <input
+            className="p-2 bg-sky-100 rounded-sm border-1"
             name = "username"
             type="text" 
             required 
@@ -49,8 +51,9 @@ function Register() {
             />
         </label>
 
-        <label>Email
+        <label className="flex flex-col gap-2">Email
             <input
+            className="p-2 bg-sky-100 rounded-sm border-1"
             name = "email"
             type="email"  
             required 
@@ -58,8 +61,9 @@ function Register() {
             />
         </label>
         
-        <label>Password
+        <label className="flex flex-col gap-2">Password
             <input
+            className="p-2 bg-sky-100 rounded-sm border-1"
             name = "password"
             type="password"  
             required 
@@ -68,12 +72,12 @@ function Register() {
             />
         </label>
         
-        <button type="submit">Submit</button>
+        <button className="place-self-center mt-4 w-1/2 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-1 py-2 rounded-lg active:bg-gray-500 active:text-sky-100 " type="submit">Submit</button>
 
 
         </form>
         <h2>{message}</h2>
-        </>
+        </section>
     )
 }
 

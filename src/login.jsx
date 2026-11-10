@@ -40,31 +40,33 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
   }
 
     return (
-        <section className="mx-auto p-4 flex flex-col w-1/2">
-        <h3 className="text-center m-4">Already registered? Sign in here</h3>
-        <form className="flex flex-col justify-center items-center gap-2" method="POST" onSubmit={(event)=>{login(event)}}>
-        <label  >Username
-            <input className="m-4"
+        <section className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 p-8 flex flex-col w-1/4">
+        <h3 className="text-center mb-6" >Already registered? </h3>
+        <h3 className="font-medium text-center mb-6">Sign in here</h3>
+        <form className="flex flex-col gap-2 m-6" method="POST" onSubmit={(event)=>{login(event)}}>
+        <label className="flex flex-col gap-2" >Username
+            <input className="p-2 bg-sky-100 rounded-sm border-1"
             name="username"
             type="text" 
             required 
-            placeholder="username"
+            
             
             />
         </label>
         
-        <label>Password
-            <input className="m-4"
+        <label className="flex flex-col gap-2">Password
+            <input className="p-2 bg-sky-100 rounded-sm border-1"
             name = "password" 
             type="password"  
             required 
-            placeholder="password"
+            
             
             />
         </label>
-        <div className="flex justify-evenly gap-4">
-        <button className="cursor-pointer hover:text-gray-400 px-4 " type="submit">Submit</button>
-        <button className="cursor-pointer hover:text-gray-400 px-4 "onClick={registerRedirect}>Register</button>
+        <div className="flex flex-col justify-evenly gap-5 m-8">
+        <button className="font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 " type="submit">Submit</button>
+        <h4 className="text-lg font-bold text-center underline">No account?</h4>
+        <button className="font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 italic"onClick={(event)=>{registerRedirect(event)}}>Register</button>
         </div>
         </form>
 

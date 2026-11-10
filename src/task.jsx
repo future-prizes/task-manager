@@ -56,16 +56,17 @@ function Task({ title, description, status, due_date, deleteTask, task_id, handl
     />
   ) : (
     
-    <section>
-      <div>
-        <h4>{title}</h4>
+    <section className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 flex flex-col w-1/2">
+      
+      <div className="flex basis-2/3 flex-col gap-2 p-2 ">
+      <h4 className="font-bold italic">{title}</h4>
         <p>{description}</p>
-        <p>{status}</p>
-        <p>{due_date}</p>
+        <p><span className="font-bold italic">Status:</span> {status}</p>
+        <p><span className="font-bold italic">Due Date:</span> {due_date}</p>
       </div>
-      <div>
-        <button onClick={handleEdit}>Edit</button>
-        <button
+      <div className="p-2 flex bg-gray-200 inset-shadow-sm inset-shadow-gray-800">
+        <button className="ml-4 cursor-pointer hover:scale-115 transition duration-250"onClick={handleEdit}>Edit</button>
+        <button className="ml-auto mr-4 cursor-pointer hover:scale-115 hover:text-red-500 transition duration-250"
           onClick={() => {deleteTask(task_id)}}>
           Delete
         </button>

@@ -7,7 +7,8 @@ function Landing({setLoggedIn, setUserId}) {
 
     const [showRegister, setShowRegister] = useState(false)
 
-    function registerRedirect() {
+    function registerRedirect(event) {
+        event.preventDefault()
         if (showRegister === false){
         setShowRegister(true)
         }
@@ -18,7 +19,7 @@ function Landing({setLoggedIn, setUserId}) {
 
     return (
         <>
-        <h2 className="text-xl">
+        <h2 className="text-4xl italic text-gray-700">
             Welcome to Task Manager
         </h2>
         <div>
