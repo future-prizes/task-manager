@@ -90,28 +90,6 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
             return error.message
         } 
     }
-
-    async function logout() {
-        const logoutURL = "/api/logout"
-        try {
-            const result = await fetch(logoutURL, {
-                method: "GET",
-                credentials : "include"
-            })
-            if (!result.ok) {
-                throw new Error("no response")
-            }
-            const response = await result.json()
-            if (response. ok ===true) {
-                setUserId("")
-                setLoggedIn(false)
-                h2.textContent = response.message
-            }
-        }
-        catch (error) {
-            return error.message
-        }
-    }
         
 
     useEffect(()=>{loadTasks()}, [])
@@ -137,7 +115,7 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
         ))}
         <NewPost loadTasks={loadTasks}/>
         <h2></h2>
-        <button onClick = {logout}>Logout</button>
+        
         
         </section>
     )

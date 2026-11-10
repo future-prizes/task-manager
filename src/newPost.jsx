@@ -30,6 +30,7 @@ function NewPost({loadTasks}) {
 
   return (
     <div className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 p-8 flex flex-col w-1/2">
+      <h3 className="text-2xl italic text-center">Add a new task</h3>
       <form className="flex flex-col gap-5 m-6"
         onSubmit={(event) => {
           newPost(event);
