@@ -40,11 +40,11 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
   }
 
     return (
-        <>
-        <h3>Already registered? Sign in here</h3>
-        <form method="POST" onSubmit={(event)=>{login(event)}}>
-        <label>Username
-            <input
+        <section className="mx-auto p-4 flex flex-col w-1/2">
+        <h3 className="text-center m-4">Already registered? Sign in here</h3>
+        <form className="flex flex-col justify-center items-center gap-2" method="POST" onSubmit={(event)=>{login(event)}}>
+        <label  >Username
+            <input className="m-4"
             name="username"
             type="text" 
             required 
@@ -54,7 +54,7 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
         </label>
         
         <label>Password
-            <input
+            <input className="m-4"
             name = "password" 
             type="password"  
             required 
@@ -62,14 +62,16 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
             
             />
         </label>
-        
-        <button type="submit">Submit</button>
+        <div className="flex justify-evenly gap-4">
+        <button className="cursor-pointer hover:text-gray-400 px-4 " type="submit">Submit</button>
+        <button className="cursor-pointer hover:text-gray-400 px-4 "onClick={registerRedirect}>Register</button>
+        </div>
         </form>
 
         <h2>{loginMessage}</h2>
 
-        <a onClick={registerRedirect}style={{color: "red"}}>Register</a>
-        </>
+        
+        </section>
     )
 }
 

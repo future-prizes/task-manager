@@ -117,10 +117,7 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
     useEffect(()=>{loadTasks()}, [])
 
     return (
-        <>
-        <div>
-            <h2>Dashboard</h2>
-        </div>    
+        <section>
         {tasks.length ===0 ? <EmptyDash/>: ""}    
         {tasks.map((task, index) => (
             
@@ -142,7 +139,7 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
         <h2></h2>
         <button onClick = {logout}>Logout</button>
         
-        </>
+        </section>
     )
 
 }

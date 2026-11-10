@@ -11,6 +11,7 @@
     "api": "cd api && venv/bin/flask run --no-debugger"
   },
   "dependencies": {
+    "@fortawesome/react-fontawesome": "^3.5.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
