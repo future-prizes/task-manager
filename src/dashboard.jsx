@@ -95,7 +95,7 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
     useEffect(()=>{loadTasks()}, [])
 
     return (
-        <section>
+        <section className="relative">
         {tasks.length ===0 ? <EmptyDash/>: ""}    
         {tasks.map((task, index) => (
             

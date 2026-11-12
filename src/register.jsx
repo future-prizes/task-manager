@@ -76,7 +76,7 @@ function Register() {
 
 
         </form>
-        <h2>{message}</h2>
+        <h2 id="registered_message" className="text-center lg:text-lg">{message}</h2>
         </section>
     )
 }

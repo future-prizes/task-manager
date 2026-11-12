@@ -64,7 +64,7 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
             />
         </label>
         <div className="flex flex-col justify-evenly gap-5 m-8">
-        <button className="font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl xl:text-lg " type="submit">Submit</button>
+        <button className="font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl xl:text-lg " type="submit">Login</button>
         <h4 className="text-lg font-bold text-center underline">No account?</h4>
         <button className="font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 italic text-2xl xl:text-lg "onClick={(event)=>{registerRedirect(event)}}>Register</button>
         </div>

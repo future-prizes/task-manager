@@ -39,7 +39,7 @@ function NewPost({loadTasks}) {
         <div id="title_status_box" className="flex flex-col lg:flex-row gap-2">
         <label className="flex basis-2/3 flex-col gap-2 ">
           Title
-          <input className="p-2 bg-sky-100 rounded-sm border-1 placeholder:italic" name = "title" type="text" required placeholder="title" />
+          <input className="p-2 bg-sky-100 rounded-sm border-1 placeholder:italic" name = "title" type="text" required placeholder="title" maxLength="100" />
         </label>
         <label className="flex basis-1/3 grow flex-col gap-2">
           Status
@@ -56,7 +56,7 @@ function NewPost({loadTasks}) {
         </label>
         <label className="items-center flex flex-col text-center gap-2">
           Description
-          <textarea className="p-2 bg-sky-100 rounded-sm border-1 w-full min-h-60 lg:min-h-40 placeholder:italic" name = "description" required placeholder="description" />
+          <textarea className="p-2 bg-sky-100 rounded-sm border-1 w-full min-h-60 lg:min-h-40 placeholder:italic" name = "description" required placeholder="description" maxLength="500"/>
         </label>
         <button className="self-center w-1/2 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl " type="submit">Submit</button>
       </form>
