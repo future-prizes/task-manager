@@ -41,27 +41,6 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
         }
     } 
 
-    async function deleteTask(task_id){
-        const deleteURL = `/api/delete-task/${task_id}`
-        try {
-
-            const result = await fetch(deleteURL, {
-                method: "DELETE",
-                credentials: "include"
-            })
-            if (!result.ok) {
-                throw new Error("no reponse")
-            }
-            
-            const response = await result.json()
-            if (response.ok) {
-            loadTasks()
-            }
-        }
-        catch (error) {
-            return error.message
-        }
-    }
 
     async function editTask(event, task_id) {
         event.preventDefault()
@@ -108,7 +87,7 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
             description = {task.description}
             status = {task.status}
             due_date = {task.due_date}
-            deleteTask = {deleteTask}
+            
             editTask = {editTask}
             task_id = {task.task_id}
             />

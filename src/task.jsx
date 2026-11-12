@@ -2,6 +2,7 @@ import { useState } from "react";
 
 
 
+
 function Editing({ title, description, due_date, handleEdit, task_id, editTask}) {
   return (
     <section className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 flex flex-col w-7/8 md:w-3/5 lg:w-1/2">
@@ -46,7 +47,32 @@ function Editing({ title, description, due_date, handleEdit, task_id, editTask})
     </section>
   );
 }
-function DeleteTask({task_id, deleteTask, handleDelete}) {
+function DeleteTask({task_id, handleDelete, loadTasks}) {
+
+
+  async function deleteTask(task_id){
+        const deleteURL = `/api/delete-task/${task_id}`
+        try {
+
+            const result = await fetch(deleteURL, {
+                method: "DELETE",
+                credentials: "include"
+            })
+            if (!result.ok) {
+                throw new Error("no reponse")
+            }
+            
+            const response = await result.json()
+            if (response.ok) {
+            loadTasks()
+            handleDelete()
+            }
+        }
+        catch (error) {
+            return error.message
+        }
+    }
+
   return (
  
   <div className="flex ml-auto gap-4">
@@ -56,8 +82,8 @@ function DeleteTask({task_id, deleteTask, handleDelete}) {
     onClick={() => {deleteTask(task_id)}}>
     Delete
   </button>
-  <button className="mr-4 cursor-pointer hover:scale-115 hover:text-red-500 transition duration-250 lg:text-lg"
-    onClick={() => {handleDelete(task_id)}}>
+  <button className="mr-4 cursor-pointer hover:scale-115 transition duration-250 lg:text-lg"
+    onClick={() => {handleDelete()}}>
     Cancel
   </button>
   
@@ -65,7 +91,7 @@ function DeleteTask({task_id, deleteTask, handleDelete}) {
   )}
 
 
-function Task({ title, description, status, due_date, task_id, deleteTask, handleEdit, editing, editTask }) {
+function Task({ title, description, status, due_date, task_id, deleteTask, handleEdit, editing, editTask, loadTasks }) {
   const [toDelete, setToDelete] = useState(false)
   
   function handleDelete() {
@@ -98,7 +124,7 @@ function Task({ title, description, status, due_date, task_id, deleteTask, handl
       </div>
       <div className="p-2 flex bg-gray-200 inset-shadow-sm inset-shadow-gray-800">
         <button className="ml-4 cursor-pointer hover:scale-115 transition duration-250 lg:text-lg"onClick={handleEdit}>Edit</button>
-        {toDelete ? <DeleteTask task_id={task_id} deleteTask={deleteTask} handleDelete={handleDelete}/> : 
+        {toDelete ? <DeleteTask loadTasks={loadTasks} setToDelete={setToDelete} task_id={task_id} deleteTask={deleteTask} handleDelete={handleDelete}/> : 
         <button className="before:content-['todelete']  ml-auto mr-4 cursor-pointer hover:scale-115 hover:text-red-500 transition duration-250 lg:text-lg"
           onClick={handleDelete}>
           Delete
