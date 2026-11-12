@@ -4,14 +4,7 @@ import { useState, useEffect } from "react"
 import NewPost from "./newPost"
 
 function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
-    const [editing, setEditing] = useState(false);
-  function handleEdit() {
-  if (editing) {
-    setEditing(false);
-  } else {
-    setEditing(true);
-  }
-}
+    
 
     async function loadTasks(){
         console.log("calling load tasks")
@@ -40,35 +33,6 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
             return error.message
         }
     } 
-
-
-    async function editTask(event, task_id) {
-        event.preventDefault()
-        const editForm = event.target
-        const editTaskURL = `/api/update-task/${task_id}`
-        const editFormData = new FormData(event.target)
-        if (!editForm.checkValidity()) {
-            editForm.checkValidity();
-            return;
-            }
-        try {
-        const result = await fetch(editTaskURL, {
-            method : "PATCH",
-            credentials: "include",
-            body: editFormData
-        })
-        if (!result.ok) {
-            throw new Error("no response")
-        }
-        const response = await result.json()
-        if (response.ok) {
-            loadTasks()
-            handleEdit()
-        }}
-        catch(error) {
-            return error.message
-        } 
-    }
         
 
     useEffect(()=>{loadTasks()}, [])
@@ -80,15 +44,11 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
             
             <Task 
             loadTasks = {loadTasks}
-            editing = {editing}
-            handleEdit = {handleEdit}
             key={index}
             title = {task.title}
             description = {task.description}
             status = {task.status}
             due_date = {task.due_date}
-            
-            editTask = {editTask}
             task_id = {task.task_id}
             />
         ))}

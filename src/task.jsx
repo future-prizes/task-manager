@@ -3,7 +3,36 @@ import { useState } from "react";
 
 
 
-function Editing({ title, description, due_date, handleEdit, task_id, editTask}) {
+function Editing({ title, description, due_date, handleEdit, task_id, editTask, loadTasks}) {
+
+  async function editTask(event, task_id) {
+        event.preventDefault()
+        const editForm = event.target
+        const editTaskURL = `/api/update-task/${task_id}`
+        const editFormData = new FormData(event.target)
+        if (!editForm.checkValidity()) {
+            editForm.checkValidity();
+            return;
+            }
+        try {
+        const result = await fetch(editTaskURL, {
+            method : "PATCH",
+            credentials: "include",
+            body: editFormData
+        })
+        if (!result.ok) {
+            throw new Error("no response")
+        }
+        const response = await result.json()
+        if (response.ok) {
+            loadTasks()
+            handleEdit()
+        }}
+        catch(error) {
+            return error.message
+        } 
+    }
+
   return (
     <section className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 flex flex-col w-7/8 md:w-3/5 lg:w-1/2">
       <h3 className="mt-6 text-2xl italic text-center">Edit this task</h3>
@@ -91,8 +120,17 @@ function DeleteTask({task_id, handleDelete, loadTasks}) {
   )}
 
 
-function Task({ title, description, status, due_date, task_id, deleteTask, handleEdit, editing, editTask, loadTasks }) {
+function Task({ title, description, status, due_date, task_id, deleteTask, editTask, loadTasks }) {
   const [toDelete, setToDelete] = useState(false)
+  const [editing, setEditing] = useState(false)
+
+  function handleEdit() {
+  if (editing) {
+    setEditing(false);
+  } else {
+    setEditing(true);
+  }
+  }
   
   function handleDelete() {
   if (toDelete) {
@@ -110,6 +148,7 @@ function Task({ title, description, status, due_date, task_id, deleteTask, handl
     handleEdit = {handleEdit}
     task_id={task_id}
     editTask = {editTask}
+    loadTasks = {loadTasks}
 
     />
   ) : (
@@ -124,8 +163,8 @@ function Task({ title, description, status, due_date, task_id, deleteTask, handl
       </div>
       <div className="p-2 flex bg-gray-200 inset-shadow-sm inset-shadow-gray-800">
         <button className="ml-4 cursor-pointer hover:scale-115 transition duration-250 lg:text-lg"onClick={handleEdit}>Edit</button>
-        {toDelete ? <DeleteTask loadTasks={loadTasks} setToDelete={setToDelete} task_id={task_id} deleteTask={deleteTask} handleDelete={handleDelete}/> : 
-        <button className="before:content-['todelete']  ml-auto mr-4 cursor-pointer hover:scale-115 hover:text-red-500 transition duration-250 lg:text-lg"
+        {toDelete ? <DeleteTask loadTasks={loadTasks} task_id={task_id} deleteTask={deleteTask} handleDelete={handleDelete}/> : 
+        <button className="ml-auto mr-4 cursor-pointer hover:scale-115 hover:text-red-500 transition duration-250 lg:text-lg"
           onClick={handleDelete}>
           Delete
         </button>}
