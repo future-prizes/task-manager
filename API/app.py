@@ -191,6 +191,7 @@ def updateTask(task_id):
             description = request.form.get("description")
             status = request.form.get("status")
             due_date = request.form.get("due_date")
+            cleaned_date = due_date.replace("T", " ")
         
             conn = db_connect()
             cursor = conn.cursor()
@@ -201,7 +202,7 @@ def updateTask(task_id):
             status = ?,
             due_date = ?
             WHERE id = ?"""
-            cursor.execute(sql, (title, description, status, due_date, task_id))
+            cursor.execute(sql, (title, description, status, cleaned_date, task_id))
 
             conn.commit()
             return jsonify({"ok": True, "message": f"task {task_id} updated"})

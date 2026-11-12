@@ -19,7 +19,7 @@ function Landing({setLoggedIn, setUserId}) {
 
     return (
         <>
-        <h2 className="text-4xl italic text-gray-700">
+        <h2 className="text-center text-4xl italic text-gray-700 my-8">
             Welcome to Task Manager
         </h2>
         <div>

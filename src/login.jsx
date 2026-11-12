@@ -40,9 +40,9 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
   }
 
     return (
-        <section className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 p-8 flex flex-col w-1/4">
-        <h3 className="text-center mb-6" >Already registered? </h3>
-        <h3 className="font-medium text-center mb-6">Sign in here</h3>
+        <section id="login-box "className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 p-8 flex flex-col sm:w-1/2 lg: 1/3 xl:w-1/4">
+        <h3 className="text-center mb-6 text-2xl xl:text-lg" >Already registered? </h3>
+        <h3 className="font-medium text-center mb-6 text-2xl xl:text-lg">Sign in here</h3>
         <form className="flex flex-col gap-2 m-6" method="POST" onSubmit={(event)=>{login(event)}}>
         <label className="flex flex-col gap-2" >Username
             <input className="p-2 bg-sky-100 rounded-sm border-1"
@@ -64,9 +64,9 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
             />
         </label>
         <div className="flex flex-col justify-evenly gap-5 m-8">
-        <button className="font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 " type="submit">Submit</button>
+        <button className="font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl xl:text-lg " type="submit">Submit</button>
         <h4 className="text-lg font-bold text-center underline">No account?</h4>
-        <button className="font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 italic"onClick={(event)=>{registerRedirect(event)}}>Register</button>
+        <button className="font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 italic text-2xl xl:text-lg "onClick={(event)=>{registerRedirect(event)}}>Register</button>
         </div>
         </form>
 
