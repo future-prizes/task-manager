@@ -1,33 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect} from "react";
 import Dashboard from "./dashboard";
 import Landing from "./landing";
 
 function App() {
-  const hostURL = "http://127.0.0.1/";
-  const port = "5000";
   const [loggedIn, setLoggedIn] = useState(false)
   const [userId, setUserId] = useState("")
   const [tasks , setTasks] = useState([])
+ 
+  
 
 
-  // test functions
-  async function showAll() {
-    
-    const fetchAllURL = "/api/show-all";
-    try {
-      const result = await fetch(fetchAllURL, {
-        method: "GET",
-      });
-      if (!result.ok) {
-        throw new Error("no response");
-      }
-      const response = await result.json();
-      h2.textContent = response;
-    } catch (error) {
-      return error.message;
-    }
-  }
-
+  
   async function api() {
     console.log("calling api")
     const apiURL = "/api/";
@@ -78,6 +61,7 @@ function App() {
   useEffect(()=>{api()}, [])
 
   return (
+    
     <main>
       
       <header className="flex items-center border-b-3 border-gray-600">
@@ -109,6 +93,8 @@ function App() {
         <h6 className=" text-center">&copy; Future-Prizes, 2026</h6>
       </footer>
     </main>
+    
+    
   );
 }
 

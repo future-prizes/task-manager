@@ -255,10 +255,10 @@ def new_post():
             return jsonify({"ok": True, "message": "New task added"})
     except sqlite3.Error as e:
                 print(f"database error {e}")
-                return jsonify({"OK":False, "message": str(e)}), 400
+                return jsonify({"ok":False, "message": str(e)}), 400
     except Exception as e:
                 print(f"unexpected error {e}")
-                return jsonify({"OK":False, "message": str(e)}), 400
+                return jsonify({"ok":False, "message": str(e)}), 400
     finally:
         if conn:
             conn.close()
@@ -282,32 +282,6 @@ def show_all():
     except:
         error = "Could not connect to database"
         return jsonify(error)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 app.cli.add_command(db_init_cli) #flask --app app db_init
 

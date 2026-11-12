@@ -43,7 +43,13 @@ function Editing({ title, description, due_date, handleEdit, task_id, editTask, 
       >
         <label className="flex basis-2/3 flex-col gap-2 ">
           Title
-          <input className="p-2 bg-sky-100 rounded-sm border-1 placeholder:italic" defaultValue = {title} name="title" type="text" required placeholder="title" />
+          <input className="p-2 bg-sky-100 rounded-sm border-1 placeholder:italic" 
+          defaultValue = {title} 
+          name="title" 
+          type="text" 
+          required 
+          placeholder="title"
+          maxLength="100" />
         </label>
 
         <label className="items-center flex flex-col text-center gap-2">
@@ -53,6 +59,7 @@ function Editing({ title, description, due_date, handleEdit, task_id, editTask, 
             name="description"
             required
             placeholder="description"
+            maxLength="500"
           />
         </label>
 

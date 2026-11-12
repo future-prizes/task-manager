@@ -39,6 +39,7 @@ function Dashboard({setLoggedIn, user_id, setUserId, tasks, setTasks}) {
 
     return (
         <section className="relative">
+            <h2 id="error_box"></h2>
         {tasks.length ===0 ? <EmptyDash/>: ""}    
         {tasks.map((task, index) => (
             

@@ -24,10 +24,12 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
         body: loginFormData,
         credentials: "include",
       });
+      if (!result.ok) {throw new Error("no response")}
       const response = await result.json();
-      if (!result.ok) {
-        setLoginMessage(response.error)
-      } else if (response.ok) {
+      if (!response.ok) {
+        setLoginMessage(response.message)
+      }
+      else if (response.ok) {
         setUserId(response.id);
         setLoggedIn(true);
       }
@@ -49,8 +51,6 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
             name="username"
             type="text" 
             required 
-            
-            
             />
         </label>
         
@@ -59,8 +59,6 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
             name = "password" 
             type="password"  
             required 
-            
-            
             />
         </label>
         <div className="flex flex-col justify-evenly gap-5 m-8">
@@ -69,10 +67,7 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
         <button className="font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 italic text-2xl xl:text-lg "onClick={(event)=>{registerRedirect(event)}}>Register</button>
         </div>
         </form>
-
-        <h2>{loginMessage}</h2>
-
-        
+        <h2 className="text-red-500 text-center text-xl">{loginMessage}</h2>
         </section>
     )
 }
