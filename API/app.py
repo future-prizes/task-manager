@@ -1,7 +1,8 @@
-from flask import Flask, request, session, jsonify, redirect, url_for
+from flask import Flask, request, session, jsonify
 import sqlite3
 from dotenv import load_dotenv
 import os
+import re
 from db import db_connect, db_init_cli
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
@@ -15,17 +16,45 @@ print("start")
 config_path = os.path.join(app.instance_path, "config.env")
 load_dotenv(config_path)
 db_name = os.environ.get("DB_NAME")
+session_lifetime = os.environ.get("PERMANENT_SESSION_LIFETIME")
 app.config["DB_PATH"] = os.path.join(app.instance_path, db_name)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
-app.config["SESSION_PERMANENT"] = True
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days = 1)
+app.config["SESSION_PERMANENT"] = os.environ.get("SESSION_PERMANENT")
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days = int(session_lifetime))
 
 
 
 #-----------------routes--------------------------#
 
-@app.route("/api/login", methods = ["GET", "POST"])
+@app.route("/api/login", methods = ["POST"])
 def login():
+    """
+    Logs in a registered user.
+    
+    Route: '/api/login'.
+
+    Methods:
+            Post.
+
+    Returns:
+            dict: 
+            (  
+            ok: bool
+            message: str
+            user: str 
+            go_to: str
+            id: str
+            ).
+    
+    If any error:
+    
+    Returns: 
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    """
     print("login")
     error = None
     if request.method == "POST":
@@ -85,6 +114,38 @@ def login():
 
 @app.route("/api/register", methods = ["POST"])
 def register():
+    """
+    Registers a new user.
+
+    Receives FormData.
+
+    Email and username must be unique, password 
+    at least 6 characters.
+
+    Route: '/api/register'.
+
+    Methods:
+            Post.
+    
+    Returns:
+            dict: 
+            (  
+            ok: bool
+            message: str
+            user: str 
+            go_to: str
+            id: str
+            ).
+    
+    If any error:
+    
+    Returns: 
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    """
     error = None
     try:
         username = request.form.get("username").strip()
@@ -93,8 +154,13 @@ def register():
 
         if len(username) <3:
             error ="Username too short"
+            raise ValueError(error)
+        if not re.match(r"^\S+@\S+\.\S+$"):
+            error = "Username in incorrect format"
+            raise ValueError(error)
         if len(password) <6:
             error = "Password must be at least 6 characters"
+            raise ValueError(error)
         if error is None:
             conn = db_connect()
             cursor = conn.cursor()
@@ -116,12 +182,56 @@ def register():
 
 @app.route("/api/logout", methods = ["GET"])
 def logout():
-    session.clear()
-    return jsonify({"ok":True, "message": "logged-out"}), 200
+    """
+    Logs out a logged-in user if session[user_id] is not None.
+
+    Route: '/api/logout'.
+
+    Returns: 
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    """
+    if session.get("user_id"):
+        session.clear()
+        return jsonify({"ok":True, "message": "logged-out"}), 200
+    else:
+        return jsonify({"ok":False, "message": "not logged-in"})
 
 @app.route("/api/load-tasks/<int:user_id>", methods = ["GET"])
 def load_tasks(user_id):
-    print("load tasks called")
+    """
+    Loads all tasks associated with a given user_id
+
+    Route: '/api/load-tasks/<int:user_id>'.
+
+    Methods:
+            GET.
+    
+    Parameters:
+            user_id (int): id in database for a user.      
+
+    Returns:
+            dict: 
+            (  
+            id: str
+            title: str
+            description: str 
+            status: str
+            due_date: str
+            ).
+    
+    If any error:
+    
+    Returns: 
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    """
     if session["user_id"] == user_id:
         try:
             user_id = session["user_id"]
@@ -151,6 +261,33 @@ def load_tasks(user_id):
 
 @app.route("/api/delete-task/<int:task_id>", methods = ["DELETE"])
 def delete_task(task_id):
+    """
+    Deletes a task with a given task_id.
+
+    Route: Route: '/api/delete-task/<int:user_id>'.
+    
+    Methods:
+            DELETE.
+    
+    Parameters:
+            task_id (int): id in database for a task.      
+    
+    Returns:
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    
+    If any error:
+    
+    Returns: 
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    """
     if session.get("user_id"): 
         try:
             conn= db_connect()
@@ -175,7 +312,32 @@ def delete_task(task_id):
 
 @app.route("/api/", methods = ["GET"])
 def api():
-    print("api called")
+    """
+    Checks if a valid session exists on the client.
+    Called the first time client page mounts or is reloaded
+
+    Route: '/api/'.
+    
+    Methods:
+            GET.
+ 
+    Returns:
+            dict:
+            (
+            ok: bool
+            message: str
+            user_id: str
+            ).
+    
+    If session[user_id] is None:
+    
+    Returns: 
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    """
     
     if session.get("user_id"):
         return jsonify({"ok": True, "message": "logged in", "user_id": session.get("user_id")})
@@ -184,6 +346,36 @@ def api():
 
 @app.route("/api/update-task/<int:task_id>", methods = ["PATCH"])
 def updateTask(task_id):
+    """
+    Updates a task's database entry for a given task_id.
+    Receives FormData 
+                :title must be <100 characters
+                :description must be <500 characters
+
+    Route: '/api/update-task/<int:user_id>'.
+    
+    Methods:
+            PATCH.
+    
+    Parameters:
+            task_id (int): id in database for a task.      
+    
+    Returns:
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    
+    If any error:
+    
+    Returns: 
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    """
     error = None
     if session.get("user_id"):
         try:
@@ -192,26 +384,47 @@ def updateTask(task_id):
             status = request.form.get("status")
             due_date = request.form.get("due_date")
             cleaned_date = due_date.replace("T", " ")
-        
-            conn = db_connect()
-            cursor = conn.cursor()
 
-            sql = """UPDATE tasks 
-            SET title = ?,
-            description = ?,
-            status = ?,
-            due_date = ?
-            WHERE id = ?"""
-            cursor.execute(sql, (title, description, status, cleaned_date, task_id))
+            if not title:
+                error = "title is empty"
+                raise ValueError(error)
+            if len(title) >100:
+                error = "title too long (>100 chars)"
+                raise ValueError(error)
+            if not description:
+                error = "description is empty"
+                raise ValueError(error)
+            if len(description) >500:
+                error = "title too long (>500 chars)"
+                raise ValueError(error)
+            if not due_date:
+                error = "due date is empty"
+                raise ValueError(error)
+            if not status:
+                error = "status is empty"
+                raise ValueError(error)
+            
 
-            conn.commit()
-            return jsonify({"ok": True, "message": f"task {task_id} updated"})
+            if error is None:
+                conn = db_connect()
+                cursor = conn.cursor()
+
+                sql = """UPDATE tasks 
+                SET title = ?,
+                description = ?,
+                status = ?,
+                due_date = ?
+                WHERE id = ?"""
+                cursor.execute(sql, (title, description, status, cleaned_date, task_id))
+
+                conn.commit()
+                return jsonify({"ok": True, "message": f"task {task_id} updated"})
         except sqlite3.Error as e:
             print(f"database error {e}")
-            return jsonify({"OK":False, "message": str(e)})
+            return jsonify({"ok":False, "message": str(e)})
         except Exception as e:
             print(f"unexpected error {e}")
-            return jsonify({"OK":False, "message": str(e)})
+            return jsonify({"ok":False, "message": str(e)})
         finally:
             if conn:
                 conn.close()
@@ -220,6 +433,33 @@ def updateTask(task_id):
 
 @app.route("/api/new-post", methods = ["POST"])
 def new_post():
+    """
+    Creates a new task in the database.
+    Receives FormData 
+                    :title must be <100 characters
+                    :description must be <500 characters
+
+    Route: '/api/new-post'.
+    
+    Methods:
+            POST.     
+    
+    Returns:
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    
+    If any error:
+    
+    Returns: 
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    """
     error = None
     try:
         title = request.form.get("title")
@@ -231,8 +471,14 @@ def new_post():
         if not title:
             error = "title is empty"
             raise ValueError(error)
+        if len(title) >100:
+            error = "title too long (>100 chars)"
+            raise ValueError(error)
         if not description:
             error = "description is empty"
+            raise ValueError(error)
+        if len(description) >500:
+            error = "title too long (>500 chars)"
             raise ValueError(error)
         if not due_date:
             error = "due date is empty"
@@ -262,26 +508,6 @@ def new_post():
     finally:
         if conn:
             conn.close()
-
-# debug route
-@app.route("/api/show-all", methods = ["GET"])
-def show_all():
-    error = None
-    try:
-        conn = db_connect()
-        cursor = conn.cursor()
-        sql = """SELECT * FROM users
-        """
-        result = cursor.execute(sql)
-        rows = result.fetchall()
-
-        conn.commit()
-        conn.close()
-        print(rows)
-        return jsonify(rows)
-    except:
-        error = "Could not connect to database"
-        return jsonify(error)
 
 app.cli.add_command(db_init_cli) #flask --app app db_init
 
