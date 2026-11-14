@@ -3,9 +3,11 @@ import EmptyDash from "./emptyDash"
 import { useState, useEffect, useRef } from "react"
 import NewPost from "./newPost"
 
+
 function Dashboard({user_id, tasks, setTasks}) {
     const originalTasks = useRef([{}])
     const [sortType, setSortType] = useState("")
+    const [sortDirection, setSortDirection] = useState("asc")
     
 
     async function loadTasks(){
@@ -34,49 +36,51 @@ function Dashboard({user_id, tasks, setTasks}) {
     function handleType(event) {
         setSortType(event.target.value)
     }
+
+    function handleDirection(event) {
+        setSortDirection(event.target.value)
+    }
         
-    function sortTasks(sortType) {
+    function sortTasks(sortType ,sortDirection) {
+        let sorted = [...tasks]
+
         if (sortType ==="title") {
-            let sorted = [...originalTasks.current].sort((a,b) => {
-                const aTitle = a.title.toLowerCase()
-                const bTitle = b.title.toLowerCase()
-               return aTitle.localeCompare(bTitle)
+            sorted.sort((a,b) => {return (sortDirection ==="ascending") ?
+               (a.title.toLowerCase()).localeCompare(b.title.toLowerCase()) :
+               (b.title.toLowerCase()).localeCompare(a.title.toLowerCase())
         })
         setTasks(sorted)
         }
         else if (sortType ==="status") {
-            
-            let sorted = [...originalTasks.current].sort((a,b) => {
-                
-                const aStatus = a.status.toLowerCase()
-                const bStatus = b.status.toLowerCase()
-               return aStatus.localeCompare(bStatus)
+            sorted.sort((a,b) => {return (sortDirection ==="ascending") ? 
+                (a.status.toLowerCase()).localeCompare(b.status.toLowerCase()) :
+                (b.status.toLowerCase()).localeCompare(a.status.toLowerCase())
             })
         setTasks(sorted)
         }
         else if (sortType ==="due_date") {
-            let sorted = [...originalTasks.current].sort((a,b) => {
-               return a.due_date - b.due_date
+            sorted.sort((a,b) => {return (sortDirection ==="ascending") ? 
+                new Date(a.due_date.replace(" ", "T")) - new Date(b.due_date.replace(" ", "T")) :
+                new Date(b.due_date.replace(" ", "T")) - new Date(a.due_date.replace(" ", "T"))
             })
         setTasks(sorted)
-        }
-        else if (sortType ==="") {
-        setTasks(originalTasks.current)
         }
     }
 
     function resetSort() {
         if (sortType) {
-            setSortType("")
+            setSortType("due_date")
         }
+        setSortDirection("ascending")
     }
 
-    useEffect(()=>{sortTasks(sortType)}, [sortType])
+    useEffect(()=>{sortTasks(sortType, sortDirection)}, [sortType, sortDirection])
     useEffect(()=>{loadTasks()}, [])
 
     return tasks.length !==0 ? (
         <>
         <section className="relative">
+            <h1 className="mx-auto my-6 w-7/8 md:w-3/5 lg:w-1/2 text-center lg:text-4xl italic"id="title_box">Your tasks</h1>
             <h2 id="error_box"></h2>
         <details className="mx-auto my-2 w-7/8 md:w-3/5 lg:w-1/2">
             <summary>
@@ -86,12 +90,16 @@ function Dashboard({user_id, tasks, setTasks}) {
             <label className="lg:text-xl"
             >Sort
             <select value={sortType} className="mx-4"onChange={(e) =>{handleType(e)}}name="sort">
-                <option value="">-</option>
+                <option value="due_date">Due date</option>
                 <option value="title">Title</option>
                 <option value="status">Status</option>
-                <option value="due_date">Due date</option>
             </select>
             </label>
+            <select value={sortDirection} className="lg:text-xl mx-4" onChange={(e)=>{handleDirection(e)}} name="direction">
+                <option value="ascending">Ascending</option>
+                <option value="descending">Descending</option>
+            
+            </select>
             <button className="cursor-pointer hover:scale-115 transition duration-250 lg:text-xl"
             onClick={resetSort}>Reset</button>
             </div>
