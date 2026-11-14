@@ -27,7 +27,9 @@ function Editing({ title, description, due_date, handleEdit, task_id, editTask, 
         if (response.ok) {
             loadTasks()
             handleEdit()
+            return response.message
         }}
+        
         catch(error) {
             return error.message
         } 
@@ -103,6 +105,7 @@ function DeleteTask({task_id, handleDelete, loadTasks}) {
             loadTasks()
             handleDelete()
             }
+            return response.message
         }
         catch (error) {
             return error.message
@@ -170,7 +173,7 @@ function Task({ title, description, status, due_date, task_id, deleteTask, editT
       </div>
       <div className="p-2 flex bg-gray-200 inset-shadow-sm inset-shadow-gray-800">
         <button className="ml-4 cursor-pointer hover:scale-115 transition duration-250 lg:text-lg"onClick={handleEdit}>Edit</button>
-        {toDelete ? <DeleteTask loadTasks={loadTasks} task_id={task_id} deleteTask={deleteTask} handleDelete={handleDelete}/> : 
+        {toDelete ? <DeleteTask loadTasks={loadTasks} task_id={task_id} handleDelete={handleDelete}/> : 
         <button className="ml-auto mr-4 cursor-pointer hover:scale-115 hover:text-red-500 transition duration-250 lg:text-lg"
           onClick={handleDelete}>
           Delete

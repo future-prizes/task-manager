@@ -239,7 +239,7 @@ def load_tasks(user_id):
             conn.row_factory = sqlite3.Row #returns object rather than tuple
             cursor = conn.cursor()
 
-            sql = """SELECT t.id, title, description, status, due_date FROM tasks t 
+            sql = """SELECT t.id AS task_id, title, description, status, due_date FROM tasks t 
             JOIN users u ON t.user_id = u.id WHERE u.id = ? ORDER BY due_date ASC
             """
             cursor.execute(sql, (user_id, ))
