@@ -36,9 +36,9 @@ function Editing({ title, description, due_date, handleEdit, task_id, editTask, 
     }
 
   return (
-    <section className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 flex flex-col w-7/8 md:w-3/5 lg:w-1/2">
+    <section className="flex justify-center flex-col inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm w-full">
       <h3 className="mt-6 text-2xl italic text-center">Edit this task</h3>
-      <form className="flex flex-col gap-5 m-6"
+      <form method="PATCH "className="flex flex-col gap-5 m-6"
         onSubmit={(event) => {
           editTask(event, task_id);
         }}
@@ -79,9 +79,9 @@ function Editing({ title, description, due_date, handleEdit, task_id, editTask, 
           <input className="p-2 bg-sky-100 rounded-sm border-1" defaultValue = {due_date}name="due_date" type="datetime-local" required />
         </label>
 
-        <input className="self-center w-1/2 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl " type="submit" value="Save Changes"/>
+        <input className="self-center w-1/3 xl:w-1/4 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl " type="submit" value="Save Changes"/>
       </form>
-      <button className="mb-6 self-center w-1/2 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl " onClick = {handleEdit}>Cancel</button>
+      <button className="mx-auto mb-6 w-1/3 xl:w-1/4 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl " onClick = {handleEdit}>Cancel</button>
     </section>
   );
 }
@@ -163,7 +163,7 @@ function Task({ title, description, status, due_date, task_id, deleteTask, editT
     />
   ) : (
     
-    <section className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 flex flex-col w-7/8 md:w-3/5 lg:w-1/2">
+    <section className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm w-full">
       
       <div className="flex basis-2/3 flex-col gap-2 p-2 ">
       <h4 className="font-bold italic">{title}</h4>

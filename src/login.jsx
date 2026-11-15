@@ -2,9 +2,11 @@ import {useState} from "react"
 
 
 
-function Login({registerRedirect, setLoggedIn, setUserId}) {
+function Login({registerRedirect, setLoggedIn, setUserId, setUserName}) {
 
     const [loginMessage, setLoginMessage] = useState("")
+    
+
 
     async function login(event) {
     event.preventDefault();
@@ -31,6 +33,7 @@ function Login({registerRedirect, setLoggedIn, setUserId}) {
       }
       else if (response.ok) {
         setUserId(response.id);
+        setUserName(response.username)
         setLoggedIn(true);
       }
     } catch (error) {

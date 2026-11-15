@@ -85,12 +85,13 @@ def login():
                     
                     session.clear()
                     session["user_id"] = user[0]
+                    session["username"] = user[1]
                     session.permanent = True
                     
                     response = {
                         "ok": True, 
                         "message": f"Welcome {username}", 
-                        "user": username, 
+                        "username": username, 
                         "go_to":"/dashboard",
                         "id": user[0]
                         }
@@ -340,7 +341,7 @@ def api():
     """
     
     if session.get("user_id"):
-        return jsonify({"ok": True, "message": "logged in", "user_id": session.get("user_id")})
+        return jsonify({"ok": True, "message": "logged in", "user_id": session.get("user_id"), "username":session.get("username")})
     else:
         return jsonify({"ok": False, "message": "not logged in"})
 
@@ -508,6 +509,47 @@ def new_post():
     finally:
         if conn:
             conn.close()
+
+@app.route("/api/search", methods=["GET"])
+def searchTasks():
+    if session.get("user_id"):
+        conn=None
+        try:
+            category = request.args.get("search").lower()
+            query = request.args.get("search_query").lower()
+            if not category or not query:
+                return jsonify({"ok": False, "message": "category or query is empty"}), 400
+            elif category not in ["title", "description", "due_date","status"]:
+                return jsonify({"ok": False, "message": "invalid category"})
+            escaped_query = "%" + query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+            user_id = session["user_id"]
+          
+            conn = db_connect()
+            conn.row_factory = sqlite3.Row #returns object rather than tuple
+            cursor = conn.cursor()
+    
+            sql = f"""SELECT * FROM
+            (SELECT t.id AS task_id, title, description, status, due_date FROM tasks t 
+            JOIN users u ON t.user_id = u.id WHERE u.id = ? ORDER BY due_date ASC) AS task_search
+            WHERE {category} LIKE ?  
+            """
+            cursor.execute(sql, (user_id, escaped_query ))
+            tasks = cursor.fetchall()
+            task_dict = [{col: task[col] for col in task.keys()} for task in tasks]
+            print(task_dict)
+            return jsonify(task_dict), 200
+
+        except sqlite3.Error as e:
+            print(f"database error {e}")
+            return jsonify({"ok":False, "message": str(e)})
+        except Exception as e:
+            print(f"unexpected error {e}")
+            return jsonify({"ok":False, "message": str(e)})
+        finally:
+            if conn:
+                conn.close()
+    else:
+        return jsonify({"ok": False, "message": "not logged in or wrong ID"})
 
 app.cli.add_command(db_init_cli) #flask --app app db_init
 

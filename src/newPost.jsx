@@ -38,7 +38,7 @@ function NewPost({loadTasks}) {
   }
 
   return (
-    <div className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 p-8 flex flex-col w-7/8 md:w-3/5 lg:w-1/2">
+    <div className="inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm mx-auto mb-8 p-8 flex flex-col w-full">
       <h3 className="text-2xl italic text-center">Add a new task</h3>
       <form id="new_post_form"className="flex flex-col gap-5 m-6"
         onSubmit={(event) => {
@@ -83,7 +83,7 @@ function NewPost({loadTasks}) {
           alt="max. 500 characters"
           title="please fill in this field, 500 character maximum"/>
         </label>
-        <button className="self-center w-1/2 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl " type="submit">Submit</button>
+        <button className="self-center w-1/3 xl:w-1/4 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl " type="submit">Submit</button>
       </form>
       <h3 className="text-red-500 text-center text-xl">{newPostErr}</h3>
     </div>
