@@ -11,6 +11,7 @@ function Dashboard({user_id, tasks, setTasks}) {
     const [searched, setSearched] = useState(null)
     const [searchMessage, setSearchMessage] = useState(null)
     
+    const search_message = document.getElementById("search_message")
 
     async function loadTasks(){
         console.log("calling load tasks")
@@ -46,20 +47,30 @@ function Dashboard({user_id, tasks, setTasks}) {
             credentials:"include",
             
         })
-        if (!result.ok) {
-            throw new Error("no response")
-        }
-        const fetchedSearch = await result.json()
         
-        setSearched(fetchedSearch)
+        
+        const fetchedSearch = await result.json()
+        if (!result.ok || !fetchedSearch.ok) {
+        search_message.classList.add("text-rose-500")
+        setSearched(null)
+        setSearchMessage(fetchedSearch.message || `Search failed (${result.status})`)
+        return
+        }
+        search_message.classList.remove("text-rose-500")
+        setSearched(fetchedSearch.search_results)
+        setSearchMessage(fetchedSearch.message)
+        event.target.reset()
         }
         catch(error) {
-            return error.message
+            setSearched(null)
+            setSearchMessage(error.message)
+            return 
         }
         }
     
     function resetSearch() {
         setSearched(null)
+        setSearchMessage(null)
     }
 
     function handleType(event) {
@@ -184,7 +195,7 @@ function Dashboard({user_id, tasks, setTasks}) {
             <input className="text-xl cursor-pointer hover:scale-115 transition duration-250 lg:text-xl" type="submit"/>
             </form>
             <button onClick={resetSearch}className="text-xl cursor-pointer hover:scale-115 transition duration-250 lg:text-xl">Reset</button>
-            <h3 id="search_message">{searchMessage}</h3>
+            <h3 className="text-center mt-5"id="search_message">{searchMessage}</h3>
         </aside>
         </section>
         

@@ -26,7 +26,7 @@ function Login({registerRedirect, setLoggedIn, setUserId, setUserName}) {
         body: loginFormData,
         credentials: "include",
       });
-      if (!result.ok) {throw new Error("no response")}
+      
       const response = await result.json();
       if (!response.ok) {
         setLoginMessage(response.message)

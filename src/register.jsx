@@ -19,14 +19,14 @@ function Register() {
         method: "POST",
         body: registerFormData,
       });
-      if (!result.ok) {
-        throw new Error("no response");
-      }
+      
       const response = await result.json()
+
+      if (!result.ok || !response.ok)
       setMessage(response.message)
     } catch (error) {
         setMessage(error.message)
-        return error.message;
+        return 
     } finally {
       registerForm.reset();
     }

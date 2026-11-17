@@ -148,6 +148,7 @@ def register():
             ).
     """
     error = None
+    conn = None
     try:
         username = request.form.get("username").strip()
         email = request.form.get("email").strip()
@@ -156,8 +157,8 @@ def register():
         if len(username) <3:
             error ="Username too short"
             raise ValueError(error)
-        if not re.match(r"^\S+@\S+\.\S+$"):
-            error = "Username in incorrect format"
+        if not re.match(r"^\S+@\S+\.\S+$", email):
+            error = "Email in incorrect format"
             raise ValueError(error)
         if len(password) <6:
             error = "Password must be at least 6 characters"
@@ -173,6 +174,8 @@ def register():
             return jsonify({"ok": True, "message": f"New user {username} registered"}), 200
     except sqlite3.Error as e:
         print(f"database error {e}")
+        if "users.username" in str(e) :
+            e = "Already a user with that username"
         return jsonify({"OK":False, "message": str(e)}), 400
     except Exception as e:
         print(f"unexpected error {e}")
@@ -233,6 +236,7 @@ def load_tasks(user_id):
             message: str
             ).
     """
+    conn= None
     if session["user_id"] == user_id:
         try:
             user_id = session["user_id"]
@@ -289,6 +293,7 @@ def delete_task(task_id):
             message: str
             ).
     """
+    conn = None
     if session.get("user_id"): 
         try:
             conn= db_connect()
@@ -377,8 +382,10 @@ def updateTask(task_id):
             message: str
             ).
     """
+    
     error = None
     if session.get("user_id"):
+        conn = None
         try:
             title = request.form.get("title")
             description = request.form.get("description")
@@ -461,6 +468,7 @@ def new_post():
             message: str
             ).
     """
+    conn = None
     error = None
     try:
         title = request.form.get("title")
@@ -515,12 +523,13 @@ def searchTasks():
     if session.get("user_id"):
         conn=None
         try:
-            category = request.args.get("search").lower()
-            query = request.args.get("search_query").lower()
-            if not category or not query:
-                return jsonify({"ok": False, "message": "category or query is empty"}), 400
-            elif category not in ["title", "description", "due_date","status"]:
-                return jsonify({"ok": False, "message": "invalid category"})
+            category = request.args.get("search", "").strip().lower()
+            query = request.args.get("search_query", "").strip().lower()
+            if category not in {"title", "description", "due_date", "status"}:
+                return jsonify({"ok": False, "message": "category is empty or invalid"}), 400
+            if not query:
+                return jsonify({"ok": False, "message": "Enter a search query"}), 400
+            
             escaped_query = "%" + query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
             user_id = session["user_id"]
           
@@ -536,20 +545,27 @@ def searchTasks():
             cursor.execute(sql, (user_id, escaped_query ))
             tasks = cursor.fetchall()
             task_dict = [{col: task[col] for col in task.keys()} for task in tasks]
+            result_number = len(task_dict)
+            if result_number ==0:
+                message = "No results found"
+            elif result_number ==1 :
+                message = "One result found"
+            else:
+                message = f"{result_number} results found"
             print(task_dict)
-            return jsonify(task_dict), 200
+            return jsonify({"ok": True, "message": message,"search_results" : task_dict}), 200
 
         except sqlite3.Error as e:
             print(f"database error {e}")
-            return jsonify({"ok":False, "message": str(e)})
+            return jsonify({"ok":False, "message": str(e)}), 500
         except Exception as e:
             print(f"unexpected error {e}")
-            return jsonify({"ok":False, "message": str(e)})
+            return jsonify({"ok":False, "message": str(e)}), 500
         finally:
             if conn:
                 conn.close()
     else:
-        return jsonify({"ok": False, "message": "not logged in or wrong ID"})
+        return jsonify({"ok": False, "message": "not logged in or wrong ID"}), 400
 
 app.cli.add_command(db_init_cli) #flask --app app db_init
 
