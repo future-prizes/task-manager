@@ -2,7 +2,7 @@ import Task from "./task"
 import EmptyDash from "./emptyDash"
 import { useState, useEffect, useRef } from "react"
 import NewPost from "./newPost"
-
+import { mkConfig, generateCsv, download } from "export-to-csv"
 
 function Dashboard({user_id, tasks, setTasks}) {
     const originalTasks = useRef([{}])
@@ -10,7 +10,8 @@ function Dashboard({user_id, tasks, setTasks}) {
     const [sortDirection, setSortDirection] = useState("asc")
     const [searched, setSearched] = useState(null)
     const [searchMessage, setSearchMessage] = useState(null)
-    
+    const csvConfig = mkConfig({ useKeysAsHeaders: true })
+    const task_box = document.getElementById("task_box")
     const search_message = document.getElementById("search_message")
 
     async function loadTasks(){
@@ -114,12 +115,22 @@ function Dashboard({user_id, tasks, setTasks}) {
         setSortDirection("asc")
     }
 
+    function exportCSV(csvConfig) {
+        let csvData = searched ? searched : tasks
+        const csv = generateCsv(csvConfig)(csvData)
+        download(csvConfig)(csv)
+        }
+    
+    function exportPDF() {
+        html2pdf().from(task_box).save()
+    }
+
     useEffect(()=>{sortTasks(sortType, sortDirection)}, [sortType, sortDirection])
     useEffect(()=>{loadTasks()}, [])
 
     return tasks.length !==0 ? (
     
-        <div>
+        <div id="dash_main">
             <h1 className="mx-auto my-6 w-7/8 md:w-3/5 lg:w-1/2 text-center lg:text-4xl italic"id="title_box">Your tasks</h1>
             <h2 id="error_box"></h2>
         <section className="grid grid-cols-1 mx-auto md:w-4/5 xl:w-full xl:grid-cols-12 xl:gap-4">
@@ -145,7 +156,7 @@ function Dashboard({user_id, tasks, setTasks}) {
             onClick={resetSort}>Reset</button>
             </div>
         </details>
-        <div className="lg:col-span-6 mx-auto flex flex-col w-full gap-8">
+        <div id="task_box" className="lg:col-span-6 mx-auto flex flex-col w-full gap-8">
         <h2></h2>
         {!searched ?
         tasks.map((task, key) => (
@@ -171,7 +182,8 @@ function Dashboard({user_id, tasks, setTasks}) {
         )) }
         <NewPost loadTasks={loadTasks}/>
         </div>
-        <aside id="search_box" className="flex flex-col lg:col-span-3 p-4 mx-auto inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm w-3/5 xl:w-7/8 lg:max-h-[30rem]">
+        <div id="right_box" className="p-4 lg:col-span-3 w-3/5 xl:w-7/8 lg:max-h-[30rem] flex flex-col gap-6">
+        <aside id="search_box" className="flex flex-col p-4 mx-auto inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm ">
             <h2 className="text-center text-3xl xl:text-xl">Search</h2>
             <form method="GET" className="flex flex-col my-6 gap-4" onSubmit={(e) => {searchTasks(e)}}>
             <div className="lg:text-xl ">
@@ -197,6 +209,19 @@ function Dashboard({user_id, tasks, setTasks}) {
             <button onClick={resetSearch}className="text-xl cursor-pointer hover:scale-115 transition duration-250 lg:text-xl">Reset</button>
             <h3 className="text-center mt-5"id="search_message">{searchMessage}</h3>
         </aside>
+        <aside className="flex flex-col lg:col-span-3 p-4 mx-auto inset-shadow-sm inset-shadow-gray-800 bg-gray-300 rounded-sm w-3/5 xl:w-3/4 lg:max-h-[30rem]"
+        id="exporter_box">
+            <div className="flex flex-col gap-6 justify-center">
+                <h3 className="text-center text-3xl xl:text-xl">Export</h3>
+                <button onClick={() =>{exportCSV(csvConfig)}} className=" cursor-pointer hover:scale-115 transition duration-250 lg:text-xl">
+                    Export these tasks
+                </button>
+                <button onClick={exportPDF} className=" cursor-pointer hover:scale-115 transition duration-250 lg:text-xl">
+                    Export these tasks
+                </button>
+            </div>
+        </aside>
+        </div>
         </section>
         
         
