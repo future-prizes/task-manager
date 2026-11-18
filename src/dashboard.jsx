@@ -82,31 +82,24 @@ function Dashboard({user_id, tasks, setTasks}) {
         setSortDirection(event.target.value)
     }
         
-    function sortTasks(sortType ,sortDirection) {
-        let sorted = [...tasks]
+    function sortTasks(list, sortType, sortDirection) {
+    const sorted = [...list]
+    const flip = sortDirection === "asc" ? 1 : -1
 
-        if (sortType ==="title") {
-            sorted.sort((a,b) => {return (sortDirection ==="asc") ?
-               (a.title.toLowerCase()).localeCompare(b.title.toLowerCase()) :
-               (b.title.toLowerCase()).localeCompare(a.title.toLowerCase())
-        })
-        setTasks(sorted)
-        }
-        else if (sortType ==="status") {
-            sorted.sort((a,b) => {return (sortDirection ==="asc") ? 
-                (a.status.toLowerCase()).localeCompare(b.status.toLowerCase()) :
-                (b.status.toLowerCase()).localeCompare(a.status.toLowerCase())
-            })
-        setTasks(sorted)
-        }
-        else if (sortType ==="due_date") {
-            sorted.sort((a,b) => {return (sortDirection ==="asc") ? 
-                new Date(a.due_date.replace(" ", "T")) - new Date(b.due_date.replace(" ", "T")) :
-                new Date(b.due_date.replace(" ", "T")) - new Date(a.due_date.replace(" ", "T"))
-            })
-        setTasks(sorted)
-        }
+    if (sortType === "title" || sortType === "status") {
+        sorted.sort((a, b) =>
+            flip * a[sortType].toLowerCase().localeCompare(b[sortType].toLowerCase())
+        )
     }
+    else if (sortType === "due_date") {
+        sorted.sort((a, b) =>
+            flip * (new Date(a.due_date.replace(" ", "T")) - new Date(b.due_date.replace(" ", "T")))
+        )
+    }
+    return sorted
+    }
+
+    const displayedTasks = sortTasks(searched ?? tasks, sortType, sortDirection)
 
     function resetSort() {
         if (sortType) {
@@ -125,7 +118,6 @@ function Dashboard({user_id, tasks, setTasks}) {
         html2pdf().from(task_box).save()
     }
 
-    useEffect(()=>{sortTasks(sortType, sortDirection)}, [sortType, sortDirection])
     useEffect(()=>{loadTasks()}, [])
 
     return tasks.length !==0 ? (
@@ -157,22 +149,10 @@ function Dashboard({user_id, tasks, setTasks}) {
             </div>
         </details>
         <div id="task_box" className="lg:col-span-6 mx-auto flex flex-col w-full gap-8">
-        <h2></h2>
-        {!searched ?
-        tasks.map((task, key) => (
+        {displayedTasks.map((task) => (
             <Task 
             loadTasks = {loadTasks}
-            key={key}
-            title = {task.title}
-            description = {task.description}
-            status = {task.status}
-            due_date = {task.due_date}
-            task_id = {task.task_id}
-            />
-        )): searched.map((task,key) => (
-            <Task 
-            loadTasks = {loadTasks}
-            key={key}
+            key={task.task_id}
             title = {task.title}
             description = {task.description}
             status = {task.status}
@@ -187,7 +167,6 @@ function Dashboard({user_id, tasks, setTasks}) {
             <h2 className="text-center text-3xl xl:text-xl">Search</h2>
             <form method="GET" className="flex flex-col my-6 gap-4" onSubmit={(e) => {searchTasks(e)}}>
             <div className="lg:text-xl ">
-                
                 <label className="text-2xl xl:text-xl flex items-center gap-4 cursor-pointer" >
                     <input className=" accent-rose-600 cursor-pointer" name="search"value="title"type="radio"/>Title</label>
 
@@ -223,15 +202,12 @@ function Dashboard({user_id, tasks, setTasks}) {
         </aside>
         </div>
         </section>
-        
-        
-        
         </div>
         ) : (
-            <>
+            <section className="mx-auto md:w-full xl:w-1/2 xl:grid-cols-12 xl:gap-4">
             <EmptyDash/>
             <NewPost loadTasks={loadTasks}/>
-            </>
+            </section>
         )
         
         

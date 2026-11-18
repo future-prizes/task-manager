@@ -9,6 +9,7 @@ function Register() {
     const registerForm = event.target
     const registerFormData = new FormData(registerForm);
     const regiserURL = "/api/register";
+    const resgisterMessage = document.getElementById("register_message")
 
     if (!registerForm.checkValidity()) {
       registerForm.checkValidity();
@@ -22,8 +23,14 @@ function Register() {
       
       const response = await result.json()
 
-      if (!result.ok || !response.ok)
+      if (!result.ok || !response.ok) {
+        resgisterMessage.classList.add("text-rose-500")
+        setMessage(response.message)
+    }
+    else if (response.ok) {
+      resgisterMessage.classList.remove("text-rose-500")
       setMessage(response.message)
+    }
     } catch (error) {
         setMessage(error.message)
         return 
@@ -69,7 +76,7 @@ function Register() {
         </label>
         <button className="place-self-center mt-4 w-1/2 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-1 py-2 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl xl:text-lg " type="submit">Submit</button>
         </form>
-        <h2 id="registered_message" className="text-center lg:text-lg">{message}</h2>
+        <h2 id="register_message" className="text-center lg:text-lg">{message}</h2>
         </section>
     )
 }

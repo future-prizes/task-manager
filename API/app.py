@@ -176,6 +176,8 @@ def register():
         print(f"database error {e}")
         if "users.username" in str(e) :
             e = "Already a user with that username"
+        elif "users.email" in str(e):
+            e = "Already a user with that email"
         return jsonify({"OK":False, "message": str(e)}), 400
     except Exception as e:
         print(f"unexpected error {e}")
