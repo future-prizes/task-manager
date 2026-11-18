@@ -8,17 +8,17 @@ from flask_bcrypt import Bcrypt
 from datetime import timedelta
 
 
-app = Flask(__name__, instance_relative_config = True)
+app = Flask(__name__, instance_relative_config = True, static_folder="../dist", static_url_path="/")
 bcrypt = Bcrypt(app)
-print("start")
-#config
 
+#config
+os.makedirs(app.instance_path, exist_ok = True)
 config_path = os.path.join(app.instance_path, "config.env")
 load_dotenv(config_path)
 db_name = os.environ.get("DB_NAME")
 session_lifetime = os.environ.get("PERMANENT_SESSION_LIFETIME")
 app.config["DB_PATH"] = os.path.join(app.instance_path, db_name)
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") #generate with python -c "import secrets; print(secrets.token_hex(32)) and place in config.env file"
 app.config["SESSION_PERMANENT"] = os.environ.get("SESSION_PERMANENT")
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days = int(session_lifetime))
 
@@ -522,6 +522,34 @@ def new_post():
 
 @app.route("/api/search", methods=["GET"])
 def searchTasks():
+    """
+    Creates a new task in the database.
+    Receives SearchFormData 
+                    :category must be one of 'title', 'description', 'due_date', 'status'.
+                    :query must not be empty.
+    
+    Route: '/api/search'.
+    
+    Methods:
+            GET.     
+    
+    Returns:
+            dict:
+            (
+            ok: bool
+            message: str
+            search_results: dict
+            ).
+    
+    If any error:
+    
+    Returns: 
+            dict:
+            (
+            ok: bool
+            message: str
+            ).
+    """
     if session.get("user_id"):
         conn=None
         try:

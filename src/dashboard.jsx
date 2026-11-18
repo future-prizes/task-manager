@@ -46,10 +46,7 @@ function Dashboard({user_id, tasks, setTasks}) {
         const result = await fetch(searchTasksURL, {
             method: "GET",
             credentials:"include",
-            
         })
-        
-        
         const fetchedSearch = await result.json()
         if (!result.ok || !fetchedSearch.ok) {
         search_message.classList.add("text-rose-500")
@@ -114,10 +111,6 @@ function Dashboard({user_id, tasks, setTasks}) {
         download(csvConfig)(csv)
         }
     
-    function exportPDF() {
-        html2pdf().from(task_box).save()
-    }
-
     useEffect(()=>{loadTasks()}, [])
 
     return tasks.length !==0 ? (
@@ -193,9 +186,6 @@ function Dashboard({user_id, tasks, setTasks}) {
             <div className="flex flex-col gap-6 justify-center">
                 <h3 className="text-center text-3xl xl:text-xl">Export</h3>
                 <button onClick={() =>{exportCSV(csvConfig)}} className=" cursor-pointer hover:scale-115 transition duration-250 lg:text-xl">
-                    Export these tasks
-                </button>
-                <button onClick={exportPDF} className=" cursor-pointer hover:scale-115 transition duration-250 lg:text-xl">
                     Export these tasks
                 </button>
             </div>

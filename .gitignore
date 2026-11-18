@@ -25,4 +25,6 @@ dist-ssr
 
 venv/
 instance/
-_pycache_/
+__pycache__
+instance
+venv
