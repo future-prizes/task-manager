@@ -1,8 +1,11 @@
 import {useState} from "react"
+import TagForm from "./tagForm"
 
 function NewPost({loadTasks}) {
 
   const [newPostErr, setNewPostErr] = useState(null)
+  const [newPostChosen, setNewPostChosen] = useState([])
+  
 
   async function newPost(event) {
     event.preventDefault();
@@ -19,21 +22,20 @@ function NewPost({loadTasks}) {
         credentials:"include",
         body: newPostFormData,
       });
-      
-      if (!result.ok) {
-        throw new Error("no response")}
       const response = await result.json()
       if (!response.ok) {
         setNewPostErr(response.message)
       }
       else {
         loadTasks()
+        setNewPostErr(null)
       }
     } catch (error) {
-      setNewPostErr(error)
-      return error.message;
+      setNewPostErr(error.message)
+      return
     } finally {
       taskForm.reset();
+      setNewPostChosen([])
     }
   }
 
@@ -43,8 +45,7 @@ function NewPost({loadTasks}) {
       <form id="new_post_form"className="flex flex-col gap-5 m-6"
         onSubmit={(event) => {
           newPost(event);
-        }}
-      >
+        }}>
         <div id="title_status_box" className="flex flex-col lg:flex-row gap-2">
         <label className="flex basis-2/3 flex-col gap-2 ">
           Title
@@ -64,6 +65,15 @@ function NewPost({loadTasks}) {
           <option value="completed">completed</option>
         </select>
         </label>
+        <label className="flex basis-1/3 grow flex-col gap-2">
+          Priority
+        <select className="p-2 bg-sky-100 rounded-sm border-1" name="priority" required >
+          <option value="low">low</option>
+          <option value="medium">medium</option>
+          <option value="urgent">urgent</option>
+        </select>
+        </label>
+
         </div>
         <label className="lg:w-1/2 flex flex-col gap-2">
           Due date
@@ -83,7 +93,9 @@ function NewPost({loadTasks}) {
           alt="max. 500 characters"
           title="please fill in this field, 500 character maximum"/>
         </label>
-        <button className="self-center w-1/3 xl:w-1/4 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl " type="submit">Submit</button>
+        <TagForm newPostChosen={newPostChosen}/>
+        <button className="self-center w-1/3 xl:w-1/4 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl " 
+        type="submit">Submit</button>
       </form>
       <h3 className="text-red-500 text-center text-xl">{newPostErr}</h3>
     </div>

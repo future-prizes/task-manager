@@ -227,6 +227,8 @@ def load_tasks(user_id):
             description: str 
             status: str
             due_date: str
+            priority: str
+            tags: list
             ).
     
     If any error:
@@ -240,19 +242,53 @@ def load_tasks(user_id):
     """
     conn= None
     if session["user_id"] == user_id:
+        
         try:
             user_id = session["user_id"]
             conn = db_connect()
             conn.row_factory = sqlite3.Row #returns object rather than tuple
             cursor = conn.cursor()
-
-            sql = """SELECT t.id AS task_id, title, description, status, due_date FROM tasks t 
-            JOIN users u ON t.user_id = u.id WHERE u.id = ? ORDER BY due_date ASC
-            """
+            
+            sql = """SELECT t.id AS task_id,
+                    t.title AS title,
+                    t.description AS description,
+                    t.due_date AS due_date,
+                    t.status AS status,
+                    t.priority AS priority,
+                    g.tag AS tag
+                FROM tasks t
+                JOIN tags g ON g.task_tag_id = t.id
+                WHERE t.user_id = ?
+                ORDER BY t.due_date ASC;
+                """
             cursor.execute(sql, (user_id, ))
-            tasks = cursor.fetchall()
-            task_dict = [{col: task[col] for col in task.keys()} for task in tasks]
-            return jsonify(task_dict), 200
+            rows= cursor.fetchall()
+            raw_tasks = {}
+           
+            for row in rows:
+                task_id = row["task_id"]
+                
+                if task_id not in raw_tasks:
+                    
+                    raw_tasks[task_id] = {
+                        "task_id":task_id,
+                        "title": row["title"],
+                        "description": row["description"],
+                        "due_date": row["due_date"],
+                        "status": row["status"],
+                        "priority": row["priority"],
+                        "tags": []
+                    }
+                    
+                if row["tag"] is not None:
+                    raw_tasks[task_id]["tags"].append(row["tag"])
+
+                tasks=[]
+
+                for d in raw_tasks.values():
+                    tasks.append(d)
+            
+            return jsonify(tasks), 200
         
         except sqlite3.Error as e:
             print(f"database error {e}")
@@ -392,8 +428,8 @@ def updateTask(task_id):
             title = request.form.get("title")
             description = request.form.get("description")
             status = request.form.get("status")
-            due_date = request.form.get("due_date")
-            cleaned_date = due_date.replace("T", " ")
+            due_date = request.form.get("due_date").replace("T", " ")
+            priority = request.form.get("priority")
 
             if not title:
                 error = "title is empty"
@@ -423,9 +459,10 @@ def updateTask(task_id):
                 SET title = ?,
                 description = ?,
                 status = ?,
-                due_date = ?
+                due_date = ?,
+                priority = ?
                 WHERE id = ?"""
-                cursor.execute(sql, (title, description, status, cleaned_date, task_id))
+                cursor.execute(sql, (title, description, status, due_date, priority, task_id))
 
                 conn.commit()
                 return jsonify({"ok": True, "message": f"task {task_id} updated"})
@@ -475,9 +512,11 @@ def new_post():
     try:
         title = request.form.get("title")
         description = request.form.get("description")
-        due_date = request.form.get("due_date")
-        cleaned_date = due_date.replace("T", " ")
-        status = request.form.get("status") if request.form.get("status") else ""
+        due_date = request.form.get("due_date").replace("T", " ")
+        priority = request.form.get("priority")
+        status = request.form.get("status")
+        tags = request.form.getlist("tags")
+        print(tags)
 
         if not title:
             error = "title is empty"
@@ -497,18 +536,31 @@ def new_post():
         if not status:
             error = "status is empty"
             raise ValueError(error)
-        
+        if priority not in ["low", "medium", "urgent"]:
+            error = "priority is empty"
+            raise ValueError(error)
+        if tags:
+            if not set(tags).issubset(["Work","Personal","Money","Relationships","Events","Travel","Leisure","Shopping"]):
+                error = "unrecognised tag"
+                raise ValueError(error)
+
         if error is None:
             conn = db_connect()
             cursor = conn.cursor()
 
-            sql = """INSERT INTO tasks (user_id, title, description, due_date, status)
-            VALUES (?, ?, ?, ?, ?)"""
+            sql = """INSERT INTO tasks (user_id, title, description, due_date, priority, status)
+            VALUES (?, ?, ?, ?, ?, ?)"""
 
-            cursor.execute(sql, (session.get("user_id"),title, description, cleaned_date, status))
+            cursor.execute(sql, (session.get("user_id"),title, description, due_date, priority, status))
+
+            if tags:
+                task_tag_id = cursor.lastrowid
+                cursor.executemany(
+                    """INSERT INTO tags (task_tag_id, tag) VALUES (?, ?)""",
+                    [(task_tag_id, tag ) for tag in tags])
 
             conn.commit()
-            
+
             return jsonify({"ok": True, "message": "New task added"})
     except sqlite3.Error as e:
                 print(f"database error {e}")
@@ -568,7 +620,7 @@ def searchTasks():
             cursor = conn.cursor()
     
             sql = f"""SELECT * FROM
-            (SELECT t.id AS task_id, title, description, status, due_date FROM tasks t 
+            (SELECT t.id AS task_id, title, description, status, due_date, priority FROM tasks t 
             JOIN users u ON t.user_id = u.id WHERE u.id = ? ORDER BY due_date ASC) AS task_search
             WHERE {category} LIKE ?  
             """

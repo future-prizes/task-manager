@@ -5,7 +5,6 @@ import {useState} from "react"
 
 function Landing({setLoggedIn, setUserId, setUserName}) {
 
-
     const [showRegister, setShowRegister] = useState(false)
 
     function registerRedirect(event) {

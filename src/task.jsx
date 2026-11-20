@@ -1,9 +1,10 @@
 import { useState } from "react";
+import TagForm from "./tagForm";
 
 
 
 
-function Editing({ title, description, due_date, handleEdit, task_id, editTask, loadTasks}) {
+function Editing({ title, description, due_date, handleEdit, task_id, editTask, loadTasks, status, priority}) {
 
   async function editTask(event, task_id) {
         event.preventDefault()
@@ -67,10 +68,19 @@ function Editing({ title, description, due_date, handleEdit, task_id, editTask, 
 
         <label className="flex basis-1/3 grow flex-col gap-2">
           Status
-          <select  className="p-2 bg-sky-100 rounded-sm border-1" name="status" required>
+          <select  className="p-2 bg-sky-100 rounded-sm border-1" defaultValue={status} name="status" required>
             <option value="to do">to do</option>
             <option value="in progress">in progress</option>
             <option value="completed">completed</option>
+          </select>
+        </label>
+
+        <label className="flex basis-1/3 grow flex-col gap-2">
+          Priority
+          <select  className="p-2 bg-sky-100 rounded-sm border-1" defaultValue={priority} name="priority" required>
+            <option value="low">low</option>
+            <option value="medium">medium</option>
+            <option value="urgent">urgent</option>
           </select>
         </label>
 
@@ -78,6 +88,7 @@ function Editing({ title, description, due_date, handleEdit, task_id, editTask, 
           Due date
           <input className="p-2 bg-sky-100 rounded-sm border-1" defaultValue = {due_date}name="due_date" type="datetime-local" required />
         </label>
+        <TagForm/>
 
         <input className="self-center w-1/3 xl:w-1/4 font-medium cursor-pointer hover:inset-shadow-sm hover:inset-shadow-gray-400 hover:bg-sky-100 px-5 py-3 rounded-lg active:bg-gray-500 active:text-sky-100 text-2xl " type="submit" value="Save Changes"/>
       </form>
@@ -86,7 +97,6 @@ function Editing({ title, description, due_date, handleEdit, task_id, editTask, 
   );
 }
 function DeleteTask({task_id, handleDelete, loadTasks}) {
-
 
   async function deleteTask(task_id){
         const deleteURL = `/api/delete-task/${task_id}`
@@ -130,7 +140,7 @@ function DeleteTask({task_id, handleDelete, loadTasks}) {
   )}
 
 
-function Task({ title, description, status, due_date, task_id, deleteTask, editTask, loadTasks }) {
+function Task({ title, description, status, due_date, task_id, priority, editTask, loadTasks, tags }) {
   const [toDelete, setToDelete] = useState(false)
   const [editing, setEditing] = useState(false)
 
@@ -159,7 +169,9 @@ function Task({ title, description, status, due_date, task_id, deleteTask, editT
     task_id={task_id}
     editTask = {editTask}
     loadTasks = {loadTasks}
-
+    status = {status}
+    priority = {priority}
+    
     />
   ) : (
     
@@ -170,6 +182,12 @@ function Task({ title, description, status, due_date, task_id, deleteTask, editT
         <p>{description}</p>
         <p><span className="font-bold italic">Status:</span> {status}</p>
         <p><span className="font-bold italic">Due Date:</span> {due_date}</p>
+        <p><span className="font-bold italic">Priority:</span> {priority}</p>
+      </div>
+      <div className="flex flex-wrap gap-4 rounded-sm m-3 p-2">
+        {tags.map((tag)=>(
+          <div key={tag} className="py-2 px-4 flex justify-center items-center bg-sky-100 rounded-sm">{tag}</div>
+        ))}
       </div>
       <div className="p-2 flex bg-gray-200 inset-shadow-sm inset-shadow-gray-800">
         <button className="ml-4 cursor-pointer hover:scale-115 transition duration-250 lg:text-lg"onClick={handleEdit}>Edit</button>

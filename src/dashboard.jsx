@@ -11,7 +11,6 @@ function Dashboard({user_id, tasks, setTasks}) {
     const [searched, setSearched] = useState(null)
     const [searchMessage, setSearchMessage] = useState(null)
     const csvConfig = mkConfig({ useKeysAsHeaders: true })
-    const task_box = document.getElementById("task_box")
     const search_message = document.getElementById("search_message")
 
     async function loadTasks(){
@@ -151,6 +150,8 @@ function Dashboard({user_id, tasks, setTasks}) {
             status = {task.status}
             due_date = {task.due_date}
             task_id = {task.task_id}
+            priority = {task.priority}
+            tags={task.tags}
             />
         )) }
         <NewPost loadTasks={loadTasks}/>
