@@ -286,7 +286,7 @@ def load_tasks(user_id):
 
             for d in raw_tasks.values():
                 tasks.append(d)
-            print(tasks)
+            
             return jsonify(tasks), 200
         
         except sqlite3.Error as e:
@@ -642,23 +642,56 @@ def searchTasks():
             conn.row_factory = sqlite3.Row #returns object rather than tuple
             cursor = conn.cursor()
     
-            sql = f"""SELECT * FROM
-            (SELECT t.id AS task_id, title, description, status, due_date, priority FROM tasks t 
-            JOIN users u ON t.user_id = u.id WHERE u.id = ? ORDER BY due_date ASC) AS task_search
+            sql = f"""
+            SELECT * FROM
+                (SELECT t.id AS task_id, 
+                t.title AS title,
+                t.description AS description, 
+                t.status AS status, 
+                t.due_date AS due_date, 
+                t.priority AS priority,
+                g.tag AS tag 
+                FROM tasks t 
+            LEFT JOIN tags g ON g.task_tag_id = t.id 
+            WHERE t.user_id = ? 
+            ORDER BY due_date ASC) AS task_search
             WHERE {category} LIKE ?  
             """
             cursor.execute(sql, (user_id, escaped_query ))
-            tasks = cursor.fetchall()
-            task_dict = [{col: task[col] for col in task.keys()} for task in tasks]
-            result_number = len(task_dict)
+            rows= cursor.fetchall()
+            raw_tasks = {}
+            tasks=[]
+            
+            for row in rows:
+                task_id = row["task_id"]
+            
+                if task_id not in raw_tasks:
+            
+                    raw_tasks[task_id] = {
+                        "task_id":task_id,
+                        "title": row["title"],
+                        "description": row["description"],
+                        "due_date": row["due_date"],
+                        "status": row["status"],
+                        "priority": row["priority"],
+                        "tags": []
+                    }
+            
+                if row["tag"] is not None:
+                    raw_tasks[task_id]["tags"].append(row["tag"])
+            
+            for d in raw_tasks.values():
+                tasks.append(d)
+            
+            result_number = len(tasks)
             if result_number ==0:
                 message = "No results found"
             elif result_number ==1 :
                 message = "One result found"
             else:
                 message = f"{result_number} results found"
-            print(task_dict)
-            return jsonify({"ok": True, "message": message,"search_results" : task_dict}), 200
+            print(tasks)
+            return jsonify({"ok": True, "message": message,"search_results" : tasks}), 200
 
         except sqlite3.Error as e:
             print(f"database error {e}")
