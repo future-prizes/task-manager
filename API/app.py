@@ -257,17 +257,18 @@ def load_tasks(user_id):
                     t.priority AS priority,
                     g.tag AS tag
                 FROM tasks t
-                JOIN tags g ON g.task_tag_id = t.id
+                LEFT JOIN tags g ON g.task_tag_id = t.id
                 WHERE t.user_id = ?
                 ORDER BY t.due_date ASC;
                 """
             cursor.execute(sql, (user_id, ))
             rows= cursor.fetchall()
             raw_tasks = {}
-           
+            tasks=[]
+            
             for row in rows:
                 task_id = row["task_id"]
-                
+
                 if task_id not in raw_tasks:
                     
                     raw_tasks[task_id] = {
@@ -279,15 +280,13 @@ def load_tasks(user_id):
                         "priority": row["priority"],
                         "tags": []
                     }
-                    
+                
                 if row["tag"] is not None:
                     raw_tasks[task_id]["tags"].append(row["tag"])
 
-                tasks=[]
-
-                for d in raw_tasks.values():
-                    tasks.append(d)
-            
+            for d in raw_tasks.values():
+                tasks.append(d)
+            print(tasks)
             return jsonify(tasks), 200
         
         except sqlite3.Error as e:
@@ -430,6 +429,8 @@ def updateTask(task_id):
             status = request.form.get("status")
             due_date = request.form.get("due_date").replace("T", " ")
             priority = request.form.get("priority")
+            tags = request.form.getlist("tags")
+            
 
             if not title:
                 error = "title is empty"
@@ -449,8 +450,11 @@ def updateTask(task_id):
             if not status:
                 error = "status is empty"
                 raise ValueError(error)
-            
-
+            if tags:
+                if not set(tags).issubset(["Work","Personal","Money","Relationships","Events","Travel","Leisure","Shopping"]):
+                    error = "unrecognised tag"
+                    raise ValueError(error)           
+            print(tags)
             if error is None:
                 conn = db_connect()
                 cursor = conn.cursor()
@@ -463,8 +467,22 @@ def updateTask(task_id):
                 priority = ?
                 WHERE id = ?"""
                 cursor.execute(sql, (title, description, status, due_date, priority, task_id))
+                
+                if tags:
+                    task_tag_id = task_id
+                    cursor.execute(
+                        """DELETE FROM tags 
+                        WHERE task_tag_id = ?""",
+                        (task_tag_id,)
+                    )
+                    cursor.executemany(
+                        """INSERT INTO tags (task_tag_id, tag)
+                        VALUES (?, ?)""",
+                        [(task_tag_id, tag) for tag in tags]
+                    )
 
                 conn.commit()
+
                 return jsonify({"ok": True, "message": f"task {task_id} updated"})
         except sqlite3.Error as e:
             print(f"database error {e}")
@@ -516,8 +534,13 @@ def new_post():
         priority = request.form.get("priority")
         status = request.form.get("status")
         tags = request.form.getlist("tags")
+        print(title)
+        print(description)
+        print(due_date)
+        print(priority)
+        print(status)
         print(tags)
-
+        
         if not title:
             error = "title is empty"
             raise ValueError(error)

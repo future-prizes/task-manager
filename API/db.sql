@@ -20,6 +20,6 @@ CREATE TABLE IF NOT EXISTS tags (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     task_tag_id INTEGER NOT NULL,
     tag TEXT NOT NULL,
-    UNIQUE (task_tag_id, tag)
-    FOREIGN KEY (task_tag_id) REFERENCES tasks (id)
+    UNIQUE (task_tag_id, tag),
+    FOREIGN KEY (task_tag_id) REFERENCES tasks (id) ON DELETE CASCADE
 );

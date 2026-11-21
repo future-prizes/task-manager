@@ -184,7 +184,7 @@ function Task({ title, description, status, due_date, task_id, priority, editTas
         <p><span className="font-bold italic">Due Date:</span> {due_date}</p>
         <p><span className="font-bold italic">Priority:</span> {priority}</p>
       </div>
-      <div className="flex flex-wrap gap-4 rounded-sm m-3 p-2">
+      <div id="tag-box" className="flex flex-wrap gap-4 rounded-sm m-3 p-2">
         {tags.map((tag)=>(
           <div key={tag} className="py-2 px-4 flex justify-center items-center bg-sky-100 rounded-sm">{tag}</div>
         ))}

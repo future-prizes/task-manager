@@ -30,7 +30,7 @@ function TagForm({newPostChosen}) {
     },[newPostChosen])
 
     return (
-        <div id="tag_box">
+        <>
         <label className="flex flex-wrap gap-2">
           {tags.map((tag) => (
             <button
@@ -47,7 +47,7 @@ function TagForm({newPostChosen}) {
         {chosen.map((tag) => (
             <input key={tag} type="hidden" name="tags" value={tag}></input>
         ))}
-        </div>
+        </>
     )
 }
 
