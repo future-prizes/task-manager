@@ -1,0 +1,35 @@
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["API"]
+
+[project]
+name = "task_manager"
+version = "0.1.0"
+dependencies = [
+    "bcrypt",
+    "click",
+    "blinker",
+    "colorama",
+    "Flask",
+    "Flask-Bcrypt",
+    "gunicorn",
+    "iniconfig",
+    "itsdangerous",
+    "Jinja2",
+    "MarkupSafe",
+    "packaging",
+    "pluggy",
+    "Pygments",
+    "python-dotenv",
+    "Werkzeug"]
+requires-python = ">=3.10"
+authors = [{name = "future-prizes"}]
+readme = "README.md"
+
+[project.optional-dependencies]
+dev = ["pytest"]
+

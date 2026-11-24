@@ -8,7 +8,11 @@ from flask_bcrypt import Bcrypt
 from datetime import timedelta
 
 
-app = Flask(__name__, instance_relative_config = True, static_folder="../dist", static_url_path="/")
+app = Flask(__name__, 
+            instance_relative_config = True, 
+            static_folder="../dist", 
+            static_url_path="/",
+            instance_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "instance"),)
 bcrypt = Bcrypt(app)
 
 #config
@@ -534,12 +538,6 @@ def new_post():
         priority = request.form.get("priority")
         status = request.form.get("status")
         tags = request.form.getlist("tags")
-        print(title)
-        print(description)
-        print(due_date)
-        print(priority)
-        print(status)
-        print(tags)
         
         if not title:
             error = "title is empty"
