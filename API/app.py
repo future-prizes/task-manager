@@ -1,4 +1,4 @@
-from flask import Flask, request, session, jsonify
+from flask import Flask, request, session, jsonify, send_from_directory
 import sqlite3
 from dotenv import load_dotenv
 import os
@@ -10,7 +10,7 @@ from datetime import timedelta
 
 app = Flask(__name__, 
             instance_relative_config = True, 
-            static_folder="../dist", 
+            static_folder="./dist", 
             static_url_path="/",
             instance_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "instance"),)
 bcrypt = Bcrypt(app)
@@ -721,6 +721,10 @@ def searchTasks():
                 conn.close()
     else:
         return jsonify({"ok": False, "message": "not logged in or wrong ID"}), 400
+
+@app.route("/")
+def serve():
+    return send_from_directory(app.static_folder, "index.html")
 
 app.cli.add_command(db_init_cli) #flask --app app db_init
 

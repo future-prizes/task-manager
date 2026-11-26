@@ -105,7 +105,20 @@ function Dashboard({user_id, tasks, setTasks}) {
     }
 
     function exportCSV(csvConfig) {
-        let csvData = searched ? searched : tasks
+        let to_export = displayedTasks.map((task) => ({
+            title: task.title,
+            description: task.description,
+            status: task.status,
+            due_date: task.due_date,
+            priority: task.priority,
+            tags: task.tags
+        }))
+        for (let t of to_export) {
+            if (t.tags) {
+                t.tags = t.tags.join(", ")
+            }
+        }
+        let csvData = to_export
         const csv = generateCsv(csvConfig)(csvData)
         download(csvConfig)(csv)
         }
