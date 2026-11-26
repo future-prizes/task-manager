@@ -1,8 +1,0 @@
-pyproject.toml
-API/node_modules/flatted/python/flatted.py
-API/task_manager.egg-info/PKG-INFO
-API/task_manager.egg-info/SOURCES.txt
-API/task_manager.egg-info/dependency_links.txt
-API/task_manager.egg-info/requires.txt
-API/task_manager.egg-info/top_level.txt
-tests/test_app.py
