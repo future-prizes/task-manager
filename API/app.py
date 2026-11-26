@@ -59,7 +59,6 @@ def login():
             message: str
             ).
     """
-    print("login")
     error = None
     if request.method == "POST":
         try:
@@ -78,7 +77,7 @@ def login():
                 cursor.execute(sql, (username, ))
                 user = cursor.fetchone()
                 conn.close()
-                print(user)
+                
                 if user is None:
                     error = "user not found"
                 else :
@@ -245,7 +244,7 @@ def load_tasks(user_id):
             ).
     """
     conn= None
-    if session["user_id"] == user_id:
+    if session.get("user_id") == user_id:
         
         try:
             user_id = session["user_id"]
@@ -339,6 +338,11 @@ def delete_task(task_id):
         try:
             conn= db_connect()
             cursor = conn.cursor()
+            cursor.execute("""
+                SELECT 1 FROM tasks WHERE id = ?""", (task_id, ))
+            result = cursor.fetchone()
+            if result == None:
+                return jsonify({"ok": False, "message": f"task {task_id} not found"})
 
             sql = """DELETE FROM tasks WHERE id = ?"""
             cursor.execute(sql, (task_id, ))
@@ -355,7 +359,7 @@ def delete_task(task_id):
         finally:
             conn.close()
     else:
-        return jsonify({"ok": False, "message": "not logged in or task not found"})
+        return jsonify({"ok": False, "message": "not logged in"})
 
 @app.route("/api/", methods = ["GET"])
 def api():
@@ -454,14 +458,26 @@ def updateTask(task_id):
             if not status:
                 error = "status is empty"
                 raise ValueError(error)
+            if not priority:
+                error = "priority is empty"
+                raise ValueError(error)
+            if priority not in ["low", "medium", "urgent"]:
+                error = "priority is not a correct input"
+                raise ValueError(error)
             if tags:
                 if not set(tags).issubset(["Work","Personal","Money","Relationships","Events","Travel","Leisure","Shopping"]):
                     error = "unrecognised tag"
                     raise ValueError(error)           
-            print(tags)
+            
             if error is None:
                 conn = db_connect()
                 cursor = conn.cursor()
+
+                cursor.execute("""
+                SELECT 1 FROM tasks WHERE id = ?""", (task_id, ))
+                result = cursor.fetchone()
+                if result == None:
+                    return jsonify({"ok": False, "message": f"task {task_id} not found"})
 
                 sql = """UPDATE tasks 
                 SET title = ?,
@@ -498,7 +514,7 @@ def updateTask(task_id):
             if conn:
                 conn.close()
     else:
-        return jsonify({"ok": False, "message": "not logged in or task not found"})
+        return jsonify({"ok": False, "message": "not logged in"})
 
 @app.route("/api/new-post", methods = ["POST"])
 def new_post():
@@ -549,7 +565,7 @@ def new_post():
             error = "description is empty"
             raise ValueError(error)
         if len(description) >500:
-            error = "title too long (>500 chars)"
+            error = "description too long (>500 chars)"
             raise ValueError(error)
         if not due_date:
             error = "due date is empty"
@@ -557,8 +573,11 @@ def new_post():
         if not status:
             error = "status is empty"
             raise ValueError(error)
-        if priority not in ["low", "medium", "urgent"]:
+        if not priority:
             error = "priority is empty"
+            raise ValueError(error)
+        if priority not in ["low", "medium", "urgent"]:
+            error = "priority is not a correct input"
             raise ValueError(error)
         if tags:
             if not set(tags).issubset(["Work","Personal","Money","Relationships","Events","Travel","Leisure","Shopping"]):

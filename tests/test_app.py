@@ -1,4 +1,4 @@
-from API.app import app
+from app import app
 
 def test_con(app):
     assert app.testing

@@ -1,8 +1,8 @@
 import pytest
 import tempfile
 import os
-from API.db import db_init, db_connect
-from API.app import app as flask_app
+from db import db_init, db_connect
+from app import app as flask_app
 
 with open(os.path.join(os.path.dirname(__file__),"dummy.sql"), "r", encoding = "utf-8") as f:
     _data_sql = f.read()
@@ -36,3 +36,22 @@ def client(app):
 @pytest.fixture
 def runner(app):
     return app.test_cli_runner()
+
+class Authoriser(object):
+    def __init__(self, client):
+        self.client = client
+
+    def login(self, username ="test1", password="test"):
+        return self.client.post(
+            "/api/login",
+            data = {"username": username, "password": password}
+        )
+
+    def logout(self):
+        return self.client.get(
+            "/api/logout"
+        )
+
+@pytest.fixture
+def auths(client):
+    return Authoriser(client)

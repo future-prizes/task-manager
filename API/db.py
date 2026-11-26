@@ -33,8 +33,8 @@ def db_connect():
     return  sqlite3.connect(get_db_path(), detect_types=sqlite3.PARSE_DECLTYPES)
 
 
-@click.command('db_init')
+@click.command('db-init')
 def db_init_cli():
     """Adds db_init to cli command in flask"""
     db_init()
-    print("Database started")
+    click.echo("Database started")
