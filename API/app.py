@@ -1,4 +1,4 @@
-from flask import Flask, request, session, jsonify, send_from_directory
+from flask import Flask, request, session, jsonify, send_from_directory, redirect
 import sqlite3
 from dotenv import load_dotenv
 import os
@@ -7,6 +7,7 @@ from db import db_connect, db_init_cli
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
 
+#start on waitress waitress-serve --listen=127.0.0.1:8000 app:app 
 
 app = Flask(__name__, 
             instance_relative_config = True, 
@@ -29,6 +30,13 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days = int(session_lifetime
 
 
 #-----------------routes--------------------------#
+@app.before_request
+def block_api_navigation():
+    if request.path.startswith('/api/'):
+        # 'navigate' means the user typed the URL or clicked a direct link to open it as a page
+        if request.headers.get('Sec-Fetch-Mode') == 'navigate':
+            return redirect('/')
+
 
 @app.route("/api/login", methods = ["POST"])
 def login():
